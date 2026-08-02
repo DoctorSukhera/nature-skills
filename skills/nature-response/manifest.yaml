@@ -42,3 +42,5 @@ references:
       path: references/difficult-cases.md
     - condition: before finalizing an output or auditing a draft response
       path: references/qa-checklist.md
+    - condition: the manuscript is being edited alongside the letter, the package has been through more than one editing round, or the package is about to be compiled and delivered — verbatim quote synchronization, red-marking baseline, deletion ripple, volatile page references, manuscript numeric self-consistency, terminology sweeps, and the clean/marked delivery gate
+      path: references/package-consistency-audit.md

@@ -102,6 +102,7 @@ Reporting notes
 | [references/common-failure-modes.md](references/common-failure-modes.md) | You see nested measurements, many comparisons, interaction claims, correlation/regression, outliers, tiny samples, or overstrong p-value language |
 | [references/figure-statistics.md](references/figure-statistics.md) | You are checking figure legends, panel statistics, error bars, stars, box/violin plots, source-data notes, or graphical reporting |
 | [references/reviewer-checklist.md](references/reviewer-checklist.md) | You are finalizing an audit or preparing a reviewer-facing risk summary |
+| [../nature-shared/core/consistency-sweep.md](../nature-shared/core/consistency-sweep.md) | The same statistic appears in more than one place, or interval terminology is in question: one metric at two precisions across table and text, SD/Std abbreviation drift, `confidence interval` used where `prediction interval` is meant, or overlapping error bars described as outperformance |
 
 ## Source hierarchy
 

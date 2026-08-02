@@ -21,6 +21,8 @@ core:
       path: core/reader-workflow.md
     - condition: maintaining terminology consistency across paper reading, polishing, writing, or slide generation
       path: core/terminology-ledger.md
+    - condition: auditing an existing or multi-round-revised manuscript for accumulated drift — terminology/unit/number variants, headline counts that do not reconcile with the Methods, claims contradicted by the paper's own tables, over- or under-claiming, tense parallelism, and prose that restates displays
+      path: core/consistency-sweep.md
 
 journal_formats:
   on_demand:
