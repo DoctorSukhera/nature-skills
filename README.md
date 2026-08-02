@@ -126,8 +126,8 @@
 | 生成文献汇报 PPT | `把这篇论文做成中文组会汇报 PPT，保留关键图件和来源标注。` |
 | 润色或翻译论文段落 | `把这段中文改写成 Nature 风格英文，保持学术含义不变。` |
 | 写摘要、引言或讨论 | `根据这些结果和图件，帮我起草 Nature 风格的摘要和引言。` |
-| 预投稿审稿模拟 | `从 Nature 审稿人视角评估这篇稿件，给出三份 reviewer reports。` |
-| 回复审稿意见 | `根据这封返修邮件，帮我写逐点回复、cover letter，并标出修改稿需要标红的位置。` |
+| 预投稿审稿模拟 | `从 Nature 审稿人视角评估这篇稿件，给出三份互盲 reviewer reports；全部定稿后再综合。` |
+| 回复审稿意见 | `根据这封返修邮件，为每位互盲审稿人分别写逐点回复和 cover letter，并标出修改稿需要标红的位置。` |
 | 查文献、他引和引用者画像 | `整理这篇文章的引用数、严格他引数、DOI，并看引用者里有没有院士、Fellow 或领域大牛。` |
 | 做科研图或论文示意图 | `根据这段方法和结果，帮我生成投稿级科研图或论文示意图草稿。` |
 
@@ -442,13 +442,13 @@ OpenClaw、OpenCode、Hermes 的具体接入方式见 [OpenClaw / OpenCode / Her
 | [`nature-figure`](skills/nature-figure/README.md) | Stable | 面向 Nature / 高影响力期刊的 Python 或 R 投稿级科研图工作流，内置 figures4papers demo，并支持通过 OpenRouter GPT Image 2 生成论文示意图草稿 | “Nature figure”, “投稿级图片”, “publication plot”, “scientific figure”, “figures4papers”, “论文示意图”, “GPT Image 2” | [详情](skills/nature-figure/README.md) |
 | [`nature-polishing`](skills/nature-polishing/README.md) | Stable | 将学术文本润色、重构或翻译为 Nature 风格英文 | “Nature style”, “润色”, “academic writing”, “论文英文” | [详情](skills/nature-polishing/README.md) |
 | [`nature-writing`](skills/nature-writing/README.md) | Draft | 起草 Nature 风格手稿章节，并重建论文论证 | “Nature writing”, “写摘要”, “写引言”, “manuscript draft”, “论文写作” | [详情](skills/nature-writing/README.md) |
-| [`nature-reviewer`](skills/nature-reviewer/README.md) | Draft | 从审稿人视角模拟 Nature 风格评审，输出三份 reviewer reports、分级 Major/Minor 意见和综合判断 | “Nature reviewer”, “预投稿评审”, “reviewer report”, “审稿人视角评估” | [详情](skills/nature-reviewer/README.md) |
+| [`nature-reviewer`](skills/nature-reviewer/README.md) | Draft | 从审稿人视角模拟 Nature 风格评审，输出三份互盲 reviewer reports、分级 Major/Minor 意见和后置综合判断 | “Nature reviewer”, “预投稿评审”, “reviewer report”, “审稿人视角评估” | [详情](skills/nature-reviewer/README.md) |
 | [`nature-citation`](skills/nature-citation/README.md) | Beta | 检索严格限定在 Nature / CNS 系列的支撑文献，并导出 ENW、RIS 或 Zotero RDF | “Nature citation”, “CNS citation”, “分段引用”, “支撑文献”, “Zotero RDF” | [详情](skills/nature-citation/README.md) |
 | [`nature-data`](skills/nature-data/README.md) | Draft | 准备 Data Availability statement、数据仓储方案和 FAIR 检查 | “Data Availability”, “数据可用性”, “repository”, “FAIR metadata” | [详情](skills/nature-data/README.md) |
 | [`nature-statistics`](skills/nature-statistics/README.md) | Draft | 审查、改写或起草 Nature / 高影响力期刊投稿中的统计报告，覆盖样本量、独立分析单位、重复数、p 值、多重比较、效应量、置信区间、图注统计和审稿人统计意见 | “Nature statistics”, “统计审查”, “statistical analysis”, “p value”, “sample size”, “replicates”, “multiple comparisons”, “图注统计”, “统计分析小节” | [详情](skills/nature-statistics/README.md) |
 | [`nature-reader`](skills/nature-reader/README.md) | Beta | 生成带来源锚点、图文对应、公式渲染和中英文对照的全文 Markdown reader | “nature reader”, “全文 Markdown”, “原文对照”, “图文对应”, “公式渲染”, “全文翻译” | [详情](skills/nature-reader/README.md) |
 | [`nature-paper-card`](skills/nature-paper-card/README.md) | Beta | 精读单篇论文并生成有来源约束的 01–16 节 Paper Card，覆盖方法逻辑、实验—结论证据链、结论边界、批判性分析和可检验研究想法 | “nature paper card”, “论文精读”, “Paper Card”, “证据链”, “结论边界” | [详情](skills/nature-paper-card/README.md) |
-| [`nature-response`](skills/nature-response/README.md) | Beta | 解析返修邮件，起草、审查和修改返修 cover letter、逐点回复审稿人的 response letter、标红修改稿，并提供 LaTeX 模板 | “response to reviewers”, “rebuttal letter”, “cover letter”, “major revision”, “返修邮件”, “审稿意见回复”, “修回信”, “LaTeX 模板” | [详情](skills/nature-response/README.md) |
+| [`nature-response`](skills/nature-response/README.md) | Beta | 解析返修邮件，为互盲审稿人分别起草、审查和修改独立 response letter，同时生成返修 cover letter、标红修改稿和 LaTeX 模板 | “response to reviewers”, “rebuttal letter”, “cover letter”, “major revision”, “返修邮件”, “审稿意见回复”, “修回信”, “LaTeX 模板” | [详情](skills/nature-response/README.md) |
 | [`nature-paper2ppt`](skills/nature-paper2ppt/README.md) | Beta | 从科研论文生成中文 PPTX 文献汇报 deck | “paper PPT”, “journal club”, “paper to slides”, “论文汇报” | [详情](skills/nature-paper2ppt/README.md) |
 | [`nature-paper-to-patent`](skills/nature-paper-to-patent/README.md) | Beta | 从论文、技术报告或项目材料生成有证据约束的中国发明专利草稿，并支持专利点挖掘、查新和技术交底书迭代 | “paper to patent”, “Chinese patent”, “论文转专利”, “权利要求书”, “技术交底书”, “专利点” | [详情](skills/nature-paper-to-patent/README.md) |
 | [`nature-ref-verifier`](skills/nature-ref-verifier/README.md) | Stable | 参考文献多源交叉验证：逐字段对比作者/标题/年份/卷期/页码，标记卷年冲突、作者编造、页码偏差等 | “verify refs”, “校验文献”, “check references”, “文献验证”, “ref check” | [详情](skills/nature-ref-verifier/README.md) |

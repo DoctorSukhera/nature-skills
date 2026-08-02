@@ -45,6 +45,10 @@ Keep these dimensions separate:
 - `work_status`: how far the concrete task has progressed and whether completion is verified;
 - `package_readiness`: whether the complete response package can be submitted safely.
 
+The IDs in this tracker belong to the internal/editor master. In each reviewer-facing response,
+map only that reviewer's IDs to neutral local labels such as `Comment 1`. Never expose another
+reviewer's IDs in the outward-facing file.
+
 ## Work status
 
 | Status | Meaning | Minimum evidence |
@@ -105,5 +109,5 @@ Derive package readiness conservatively:
 - If the author says "we added an experiment", request experiment name, condition, sample size or replicate unit, result summary, and figure/table location.
 - If the author says "we added a citation", request verified bibliographic detail unless already supplied.
 - If a reviewer asks for impossible or out-of-scope work, use `PARTIAL` or `OUT_OF_SCOPE` plus claim softening or limitation.
-- If a reviewer is factually wrong, usually combine `CLARIFY_EXISTING` with a small text clarification.
+- If a reviewer missed information already present in the manuscript, use `CLARIFY_EXISTING` with a small presentation improvement. Do not reply that the information was already stated or imply that the reviewer failed to read carefully.
 - If a central claim remains unsupported, use `SOFTEN_CLAIM` or `BLOCKING`, not confident compliance language.

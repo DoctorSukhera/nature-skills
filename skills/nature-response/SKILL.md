@@ -2,8 +2,10 @@
 name: nature-response
 description: >-
   Draft, audit, or revise Nature-style revision correspondence packages: point-by-point
-  reviewer response letters, rebuttal letters, revision cover letters, LaTeX cover/response
-  templates, and red-marked revised-manuscript excerpts. Use for reviewer comments, editor
+  reviewer-separated response letters, rebuttal letters, revision cover letters, LaTeX
+  cover/response templates, and red-marked revised-manuscript excerpts. Keep mutually blind
+  reviewers isolated so no reviewer-facing response reveals another reviewer's comments,
+  numbering, recommendation, or author response. Use for reviewer comments, editor
   decision letters, pasted editorial emails, response drafts, cover letters, response to
   reviewers, rebuttal, 修回信, 返修邮件, 编辑邮件, 返修 cover letter, 审稿意见回复,
   逐点回复, 大修回复, 小修回复, 回复审稿人, 修改稿回复, 写rebuttal, 回应审稿意见,
@@ -47,7 +49,7 @@ Use `references/intake-and-routing.md` to fix the task mode, minimum inputs, and
 
 ### 3. Run the workflow
 
-Follow the workflow in `core/workflow.md`: if the user pasted a journal email, first parse manuscript metadata, decision type, editor instructions, reviewer reports, required files, and deadlines from the email; identify mode and pass the decision-type gate; apply the Major- or Minor-Revision strategy without downgrading the severity of individual comments; extract editor instructions (IDs `E.1`) then reviewer comments (`R1.1`, `R2.1`) when present; classify each item by response action and independently verified work status; build a strategy summary; draft point-by-point responses and/or a revision cover letter; map every claimed change to a manuscript location or explicit placeholder; mark changed manuscript text in red on a backed-up copy when editing; format quoted revised manuscript text in the response letter in italics; start each new reviewer response on a new page in LaTeX/print-oriented outputs; flag missing author input; run QA; and derive package readiness from the per-item statuses and blocking state.
+Follow the workflow in `core/workflow.md`: if the user pasted a journal email, first parse manuscript metadata, decision type, editor instructions, reviewer reports, required files, deadlines, and reviewer-visibility rules from the email; identify mode and pass the decision-type gate; apply the Major- or Minor-Revision strategy without downgrading the severity of individual comments; extract editor instructions (IDs `E.1`) then reviewer comments (`R1.1`, `R2.1`) when present; classify each item by response action and independently verified work status; build an internal/editor master strategy and tracker; draft a standalone privacy-filtered response for each mutually blind reviewer; when a reviewer missed material already present in the manuscript, treat that as a clarity signal and revise the presentation instead of replying that the point was already stated; draft a revision cover letter when required; map every claimed change to a manuscript location or explicit placeholder; mark changed manuscript text in red on a backed-up copy when editing; format quoted revised manuscript text in the response letter in italics; flag missing author input; run QA; and derive package readiness from the per-item statuses and blocking state.
 
 Never invent experiments, citations, line numbers, figure panels, supplementary items, editor instructions, or manuscript changes. Mark anything the author must supply as `AUTHOR_INPUT_NEEDED`.
 
