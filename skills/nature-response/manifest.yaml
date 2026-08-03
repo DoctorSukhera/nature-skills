@@ -44,3 +44,9 @@ references:
       path: references/qa-checklist.md
     - condition: the manuscript is being edited alongside the letter, the package has been through more than one editing round, or the package is about to be compiled and delivered — verbatim quote synchronization, red-marking baseline, deletion ripple, volatile page references, manuscript numeric self-consistency, terminology sweeps, and the clean/marked delivery gate
       path: references/package-consistency-audit.md
+
+quality_tools:
+  package_consistency_script: scripts/check_package_consistency.py
+  use_when: after the first complete LaTeX revision package, after every manuscript edit, and immediately before delivery
+  purpose: check response-letter quotes against the manuscript, pair reviewer comments with author responses, and compare clean and marked manuscript text after revision markup is removed
+  script_resolution: resolve relative to the loaded SKILL.md directory, never the user working directory

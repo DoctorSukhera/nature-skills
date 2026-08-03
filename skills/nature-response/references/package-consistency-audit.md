@@ -29,24 +29,27 @@ Checks:
   `Table 1`), record that this substitution is deliberate so the automated check does not flag it
   every round.
 
-Script the check rather than eyeballing it. Normalize whitespace, then assert that the tail of each
-quoted block occurs in the manuscript source:
+Script the check rather than eyeballing it. Resolve the script relative to this skill directory,
+then pass the actual package paths:
 
-```python
-import re
-m = ' '.join(open('main.tex').read().split())
-r = open('response.tex').read()
-for q in re.findall(r'\\(?:revtext|oldtext)\{(.*?)\}', r, re.S):
-    body = re.sub(r'\\textbf\{[^}]*\}\s*', '', q).replace('\\dots', '').strip()
-    if len(body) < 40:
-        continue                      # skip inline style markers, not real quotes
-    tail = ' '.join(body[-85:].split())
-    if tail not in m:
-        print('MISMATCH:', tail[:70])
+```bash
+python scripts/check_package_consistency.py \
+  --manuscript main.tex \
+  --response response.tex \
+  --clean main-clean.tex \
+  --marked main-marked.tex
 ```
 
-Re-run it after **every** manuscript edit. In practice this check catches drift on most rounds once
-a package has been revised more than twice.
+The checker normalizes LaTeX and whitespace, checks the arguments of `\\RevisedExcerpt`,
+`\\revtext`, and `\\oldtext` against the manuscript, compares the number of
+`\\ReviewerComment` and `\\AuthorResponse` blocks, and confirms that clean and marked sources have
+the same text after revision markup is removed. Use repeated `--quote-macro NAME` arguments when a
+project defines a different quote macro. Use `--json` for machine-readable findings. A non-zero
+exit status means the package still contains a mechanical mismatch.
+
+Re-run it after **every** manuscript edit. It does not replace compiled-PDF page checks, color
+inspection, citation/reference diagnostics, or editorial judgement. Those remain manual gates in
+the sections below.
 
 ## 2. Red marking must have a baseline
 
