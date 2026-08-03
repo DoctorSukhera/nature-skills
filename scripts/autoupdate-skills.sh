@@ -28,6 +28,7 @@
 # Environment (flags take precedence):
 #   SKILLS_DEST=/path      Destination skills dir  (default ~/.claude/skills)
 #   SKILLS_THROTTLE=SECS   Min seconds between upstream checks (default 3600 = 1h; 0 = always)
+#   SKILLS_STATE_DIR=/path Base state dir (default $XDG_STATE_HOME/nature-skills)
 #
 set -uo pipefail
 
@@ -37,10 +38,6 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DEST="${SKILLS_DEST:-$HOME/.claude/skills}"
 THROTTLE="${SKILLS_THROTTLE:-3600}"
 FORCE=0
-
-STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/nature-skills"
-STAMP="$STATE_DIR/last-check"
-LOG="$STATE_DIR/autoupdate.log"
 
 usage() { sed -n '2,32p' "$0"; }
 
@@ -62,6 +59,15 @@ case "$THROTTLE" in
     exit 2
     ;;
 esac
+
+# Keep throttle and logs independent for each destination. A user may install
+# the same repository into Codex and Claude Code; one client's recent check
+# must not prevent the other destination from being verified and repaired.
+STATE_ROOT="${SKILLS_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/nature-skills}"
+DEST_KEY=$(printf '%s' "$DEST" | cksum | awk '{print $1}')
+STATE_DIR="$STATE_ROOT/$DEST_KEY"
+STAMP="$STATE_DIR/last-check"
+LOG="$STATE_DIR/autoupdate.log"
 
 mkdir -p "$STATE_DIR" 2>/dev/null || true
 log() { printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >>"$LOG" 2>/dev/null; }
