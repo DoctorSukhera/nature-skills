@@ -1,5 +1,16 @@
 # Action mapping
 
+## Contents
+
+- [Action labels](#action-labels)
+- [Internal tracker fields](#internal-tracker-fields)
+- [Work status](#work-status)
+- [Task-control fields](#task-control-fields)
+- [Readiness state](#readiness-state)
+- [Risk level](#risk-level)
+- [Mapping rules](#mapping-rules)
+
+
 Use this file to map every reviewer concern to a concrete response action.
 
 ## Action labels

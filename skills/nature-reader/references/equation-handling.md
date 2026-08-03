@@ -1,5 +1,17 @@
 # Equation handling
 
+## Contents
+
+- [Goal](#goal)
+- [Portable Markdown math](#portable-markdown-math)
+- [Display-equation block](#display-equation-block)
+- [Confidence ladder and visual fallback](#confidence-ladder-and-visual-fallback)
+- [Equation index](#equation-index)
+- [公式索引](#公式索引)
+- [Source-map contract](#source-map-contract)
+- [Compatibility fallback](#compatibility-fallback)
+
+
 Load this reference whenever the source contains equations, mathematical expressions, chemical formulae, custom LaTeX macros, or image-only formulae.
 
 ## Goal

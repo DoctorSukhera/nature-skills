@@ -1,5 +1,16 @@
 # Policy Principles
 
+## Contents
+
+- [Governing rules](#governing-rules)
+- [Minimal dataset test](#minimal-dataset-test)
+- [Availability routes](#availability-routes)
+- [Data, code, materials, protocols](#data-code-materials-protocols)
+- [Sensitive and human-participant data](#sensitive-and-human-participant-data)
+- [Submission-stage checks](#submission-stage-checks)
+- [Source notes](#source-notes)
+
+
 Use this file when deciding what a Nature-ready data statement must disclose.
 
 ## Governing rules

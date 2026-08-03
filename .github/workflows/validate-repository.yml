@@ -11,6 +11,7 @@ on:
       - 'scripts/validate-readme-mirror.py'
       - 'scripts/validate-skill-index.py'
       - 'scripts/validate-skill-metadata.py'
+      - 'scripts/update-reference-tocs.py'
       - '.github/workflows/validate-repository.yml'
   push:
     branches:
@@ -24,6 +25,7 @@ on:
       - 'scripts/validate-readme-mirror.py'
       - 'scripts/validate-skill-index.py'
       - 'scripts/validate-skill-metadata.py'
+      - 'scripts/update-reference-tocs.py'
       - '.github/workflows/validate-repository.yml'
 
 permissions:
@@ -34,12 +36,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
 
       - name: Run repository validation
         run: python3 scripts/validate-repository.py
+
+      - name: Verify reference navigation is current
+        run: |
+          python3 scripts/update-reference-tocs.py
+          git diff --exit-code

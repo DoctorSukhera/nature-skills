@@ -1,5 +1,18 @@
 # Difficult cases
 
+## Contents
+
+- [Impossible or out-of-scope experiment](#impossible-or-out-of-scope-experiment)
+- [Reviewer factual error](#reviewer-factual-error)
+- [Conflicting reviewer requests](#conflicting-reviewer-requests)
+- [Repeated concerns across reviewers](#repeated-concerns-across-reviewers)
+- [Reviewer-requested citation](#reviewer-requested-citation)
+- [Major statistical critique](#major-statistical-critique)
+- [Ethics, compliance, or data-integrity critique](#ethics-compliance-or-data-integrity-critique)
+- [Transfer after review](#transfer-after-review)
+- [Appeal-like case](#appeal-like-case)
+
+
 Use this file when comments cannot be handled with straightforward acceptance and revision.
 
 ## Impossible or out-of-scope experiment

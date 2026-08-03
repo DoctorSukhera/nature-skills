@@ -1,5 +1,15 @@
 # Delivery, Verification, and Failure Handling
 
+## Contents
+
+- [Supporting Information](#supporting-information)
+- [Verification and Reading](#verification-and-reading)
+- [Zotero](#zotero)
+- [Naming Convention](#naming-convention)
+- [Failure Handling](#failure-handling)
+- [To Confirm With The User on First Run](#to-confirm-with-the-user-on-first-run)
+
+
 Load this reference when the user requests Supporting Information, when files are ready for
 verification and delivery, or when an access attempt reaches a typed failure or retry state.
 

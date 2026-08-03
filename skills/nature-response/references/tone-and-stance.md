@@ -1,5 +1,16 @@
 # Tone and stance
 
+## Contents
+
+- [Core posture](#core-posture)
+- [Recommended sentence patterns](#recommended-sentence-patterns)
+- [Weak or forbidden patterns](#weak-or-forbidden-patterns)
+- [Disagreement pattern](#disagreement-pattern)
+- [Reviewer misunderstanding pattern](#reviewer-misunderstanding-pattern)
+- [Out-of-scope pattern](#out-of-scope-pattern)
+- [Claim-strength verbs](#claim-strength-verbs)
+
+
 Use this file when drafting response prose, rewriting defensive author notes, or deciding how to disagree.
 
 ## Core posture

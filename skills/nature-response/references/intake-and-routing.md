@@ -1,5 +1,17 @@
 # Intake and routing
 
+## Contents
+
+- [Mandatory decision-type gate](#mandatory-decision-type-gate)
+- [Task modes](#task-modes)
+- [Readiness states](#readiness-states)
+- [Editor instruction handling](#editor-instruction-handling)
+- [Pasted editorial email handling](#pasted-editorial-email-handling)
+- [Minimum information by output type](#minimum-information-by-output-type)
+- [Clarifying question rules](#clarifying-question-rules)
+- [Routing shortcuts](#routing-shortcuts)
+
+
 Use this file before splitting comments or drafting prose. Its job is to decide what task the
 user is asking for, whether the supplied information is enough, and what output state is honest.
 

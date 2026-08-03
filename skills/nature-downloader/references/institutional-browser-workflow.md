@@ -1,5 +1,13 @@
 # Institutional Browser Workflow
 
+## Contents
+
+- [Recommended Web Access Workflow](#recommended-web-access-workflow)
+- [Publisher Verification and ScienceDirect](#publisher-verification-and-sciencedirect)
+- [Institutional Authentication Handoff and Retry](#institutional-authentication-handoff-and-retry)
+- [Download PDF From Browser Context](#download-pdf-from-browser-context)
+
+
 Load this reference only when lawful open-access sources are unavailable and the selected route
 requires the user's institution-authorized browser session. It covers Web of Science discovery,
 publisher verification, institutional authentication handoff, and PDF transfer from the browser

@@ -1,5 +1,16 @@
 # Report structure
 
+## Contents
+
+- [Default output contract](#default-output-contract)
+- [Review setup](#review-setup)
+- [Per-reviewer structure](#per-reviewer-structure)
+- [Concern traceability and severity display](#concern-traceability-and-severity-display)
+- [Cross-review synthesis structure](#cross-review-synthesis-structure)
+- [Risk / unsupported claims section](#risk-unsupported-claims-section)
+- [Style rules](#style-rules)
+
+
 ## Default output contract
 
 - The default output should contain these sections in order:
