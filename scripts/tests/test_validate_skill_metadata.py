@@ -79,5 +79,50 @@ description: Missing closing fence.
         self.assertTrue(any("missing its closing" in error for error in errors), errors)
 
 
+class OpenAIYamlTests(unittest.TestCase):
+    def validate(self, content: str, skill_name: str = "demo") -> list[str]:
+        original_root = VALIDATOR.ROOT
+        try:
+            with tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                path = root / "skills" / skill_name / "agents" / "openai.yaml"
+                path.parent.mkdir(parents=True)
+                path.write_text(content, encoding="utf-8")
+                VALIDATOR.ROOT = root
+                return VALIDATOR.validate_openai_yaml(path, skill_name)
+        finally:
+            VALIDATOR.ROOT = original_root
+
+    def test_complete_quoted_interface_is_valid(self) -> None:
+        errors = self.validate(
+            '''interface:
+  display_name: "Demo Skill"
+  short_description: "Help with demonstrative skill workflows"
+  default_prompt: "Use $demo to complete this demonstrative task."
+'''
+        )
+        self.assertEqual([], errors)
+
+    def test_default_prompt_must_name_the_skill(self) -> None:
+        errors = self.validate(
+            '''interface:
+  display_name: "Demo Skill"
+  short_description: "Help with demonstrative skill workflows"
+  default_prompt: "Help me complete this demonstrative task."
+'''
+        )
+        self.assertTrue(any("must explicitly mention $demo" in error for error in errors))
+
+    def test_interface_strings_must_be_quoted(self) -> None:
+        errors = self.validate(
+            '''interface:
+  display_name: Demo Skill
+  short_description: "Help with demonstrative skill workflows"
+  default_prompt: "Use $demo to complete this demonstrative task."
+'''
+        )
+        self.assertTrue(any("display_name must be double-quoted" in error for error in errors))
+
+
 if __name__ == "__main__":
     unittest.main()

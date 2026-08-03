@@ -4,6 +4,7 @@
 Checks every top-level directory under skills/ for:
 - required SKILL.md / README.md / README_EN.md / manifest.yaml files
 - valid SKILL.md YAML frontmatter with only supported keys
+- valid agents/openai.yaml interface metadata for every triggerable skill
 - matching SKILL.md frontmatter name and manifest.yaml name
 - valid manifest YAML
 - relative manifest route paths, fragments, and scripts that exist on disk
@@ -33,6 +34,11 @@ ALLOWED_SKILL_FRONTMATTER_KEYS = {
     "name",
 }
 REQUIRED_SKILL_FRONTMATTER_KEYS = {"description", "name"}
+REQUIRED_OPENAI_INTERFACE_KEYS = {
+    "default_prompt",
+    "display_name",
+    "short_description",
+}
 
 
 def read_text(path: Path) -> str:
@@ -76,6 +82,53 @@ def parse_skill_frontmatter(skill_md: Path) -> tuple[dict[str, Any] | None, list
         if key in keys and (not isinstance(value, str) or not value.strip()):
             errors.append(f"{rel}: frontmatter {key} must be a non-empty string")
     return frontmatter, errors
+
+
+def validate_openai_yaml(path: Path, skill_name: str) -> list[str]:
+    """Validate the Codex-facing skill metadata contract."""
+    rel = path.relative_to(ROOT)
+    if not path.exists():
+        return [f"{rel}: missing agents/openai.yaml"]
+
+    raw = read_text(path)
+    try:
+        config = yaml.safe_load(raw) or {}
+    except Exception as exc:
+        return [f"{rel}: invalid YAML: {exc}"]
+
+    errors: list[str] = []
+    interface = config.get("interface")
+    if not isinstance(interface, dict):
+        return [f"{rel}: interface must be a mapping"]
+
+    missing = sorted(REQUIRED_OPENAI_INTERFACE_KEYS - set(interface))
+    if missing:
+        errors.append(f"{rel}: missing interface keys: {', '.join(missing)}")
+
+    for key in REQUIRED_OPENAI_INTERFACE_KEYS:
+        value = interface.get(key)
+        if key in interface and (not isinstance(value, str) or not value.strip()):
+            errors.append(f"{rel}: interface.{key} must be a non-empty string")
+        if key in interface and not re.search(
+            rf'^\s+{re.escape(key)}:\s+"(?:[^"\\]|\\.)*"\s*$',
+            raw,
+            flags=re.MULTILINE,
+        ):
+            errors.append(f"{rel}: interface.{key} must be double-quoted")
+
+    description = interface.get("short_description")
+    if isinstance(description, str) and not 25 <= len(description) <= 64:
+        errors.append(
+            f"{rel}: interface.short_description must be 25-64 characters, "
+            f"got {len(description)}"
+        )
+
+    prompt = interface.get("default_prompt")
+    if isinstance(prompt, str) and f"${skill_name}" not in prompt:
+        errors.append(
+            f"{rel}: interface.default_prompt must explicitly mention ${skill_name}"
+        )
+    return errors
 
 
 PATH_KEYS = {"path", "reference", "script", "backend_script"}
@@ -175,6 +228,11 @@ def main() -> int:
         if manifest_name != skill_name:
             errors.append(
                 f"{rel}: manifest name {manifest_name!r} does not match SKILL.md name {skill_name!r}"
+            )
+
+        if skill_dir.name not in SUPPORT_ONLY and isinstance(skill_name, str):
+            errors.extend(
+                validate_openai_yaml(skill_dir / "agents" / "openai.yaml", skill_name)
             )
 
         for raw_path in iter_manifest_paths(manifest):
