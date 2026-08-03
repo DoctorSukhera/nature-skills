@@ -32,6 +32,19 @@ PULL="${PULL:-0}"
 PRUNE="${PRUNE:-0}"
 CHECK_ONLY="${CHECK_ONLY:-0}"
 MANIFEST_NAME=".nature-skills-install.txt"
+DIFF_EXCLUDES=(
+  -x '.DS_Store'
+  -x '__pycache__'
+  -x '.pytest_cache'
+  -x '*.pyc'
+  -x '*.pyo'
+)
+RSYNC_EXCLUDES=(
+  --exclude='.DS_Store'
+  --exclude='__pycache__'
+  --exclude='.pytest_cache'
+  --exclude='*.py[cod]'
+)
 
 usage() {
   cat <<'USAGE'
@@ -137,7 +150,7 @@ verify_install() {
     if [ ! -d "$dst_path" ]; then
       echo "MISSING  $name"
       status=1
-    elif diff -qr "$src_path" "$dst_path" >"$DIFF_OUT"; then
+    elif diff -qr "${DIFF_EXCLUDES[@]}" "$src_path" "$dst_path" >"$DIFF_OUT"; then
       echo "MATCH    $name"
     else
       echo "DIFF     $name"
@@ -179,7 +192,7 @@ echo "==> Syncing skills from $SRC"
 echo "    into $DST"
 while IFS= read -r name; do
   mkdir -p "$DST/$name"
-  rsync -a --delete "$SRC/$name/" "$DST/$name/"
+  rsync -a --delete "${RSYNC_EXCLUDES[@]}" "$SRC/$name/" "$DST/$name/"
   echo "    synced $name"
 done < "$SKILL_LIST"
 
