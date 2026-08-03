@@ -70,9 +70,61 @@ DEST_KEY=$(printf '%s' "$DEST" | cksum | awk '{print $1}')
 STATE_DIR="$STATE_ROOT/$DEST_KEY"
 STAMP="$STATE_DIR/last-check"
 LOG="$STATE_DIR/autoupdate.log"
+LOCK_DIR="$STATE_DIR/update.lock"
+LOCK_OWNED=0
 
 mkdir -p "$STATE_DIR" 2>/dev/null || true
 log() { printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >>"$LOG" 2>/dev/null; }
+
+release_lock() {
+  if [ "$LOCK_OWNED" = "1" ]; then
+    if [ "$(cat "$LOCK_DIR/pid" 2>/dev/null || true)" = "$$" ]; then
+      rm -rf "$LOCK_DIR" 2>/dev/null || true
+    fi
+    LOCK_OWNED=0
+  fi
+}
+
+handle_signal() {
+  trap - HUP INT TERM
+  release_lock
+  exit 130
+}
+
+acquire_lock() {
+  local attempt owner
+  for attempt in 1 2; do
+    if mkdir "$LOCK_DIR" 2>/dev/null; then
+      printf '%s\n' "$$" >"$LOCK_DIR/pid"
+      LOCK_OWNED=1
+      return 0
+    fi
+
+    owner=$(cat "$LOCK_DIR/pid" 2>/dev/null || true)
+    case "$owner" in
+      ''|*[!0-9]*) ;;
+      *)
+        if kill -0 "$owner" 2>/dev/null; then
+          log "another updater is already running for $DEST (pid $owner) — skip"
+          return 1
+        fi
+        ;;
+    esac
+
+    # A terminated updater can leave its mkdir-based lock behind. Remove only
+    # this destination-scoped lock and retry the atomic mkdir once.
+    rm -rf "$LOCK_DIR" 2>/dev/null || true
+  done
+
+  log "could not acquire updater lock for $DEST — skip"
+  return 1
+}
+
+if ! acquire_lock; then
+  exit 0
+fi
+trap release_lock EXIT
+trap handle_signal HUP INT TERM
 
 installer="$REPO_ROOT/scripts/update-codex-skills.sh"
 if [ ! -x "$installer" ]; then
