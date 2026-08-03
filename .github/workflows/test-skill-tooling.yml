@@ -1,0 +1,75 @@
+name: Test skill tooling
+
+on:
+  pull_request:
+    paths:
+      - 'skills/nature-academic-search/mcp-server/**'
+      - 'skills/nature-downloader/**'
+      - 'skills/nature-paper-card/**'
+      - 'skills/nature-paper-to-patent/**'
+      - '.github/workflows/test-skill-tooling.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'skills/nature-academic-search/mcp-server/**'
+      - 'skills/nature-downloader/**'
+      - 'skills/nature-paper-card/**'
+      - 'skills/nature-paper-to-patent/**'
+      - '.github/workflows/test-skill-tooling.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            skills/nature-academic-search/mcp-server/requirements.txt
+            skills/nature-downloader/requirements.txt
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install pytest
+          python -m pip install \
+            -r skills/nature-academic-search/mcp-server/requirements.txt \
+            -r skills/nature-downloader/requirements.txt
+
+      - name: Test nature-academic-search
+        working-directory: skills/nature-academic-search/mcp-server
+        run: python -m pytest -q tests
+
+      - name: Test nature-downloader Python tooling
+        working-directory: skills/nature-downloader
+        run: python -m pytest -q tests/python
+
+      - name: Test nature-paper-card
+        working-directory: skills/nature-paper-card
+        run: python -m pytest -q tests
+
+      - name: Test nature-paper-to-patent
+        working-directory: skills/nature-paper-to-patent
+        run: python -m pytest -q tests
+
+  javascript-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Test nature-downloader JavaScript tooling
+        working-directory: skills/nature-downloader
+        run: bun test tests/unit
