@@ -43,6 +43,11 @@ def candidate(**overrides):
 
 
 class AuthorExportTests(unittest.TestCase):
+    def test_ris_is_the_default(self):
+        self.assertEqual(MODULE.DEFAULT_EXPORT_FORMAT, "ris")
+        self.assertEqual(MODULE.infer_export_format(None), "ris")
+        self.assertEqual(MODULE.export_filename("ris"), "references.ris")
+
     def test_crossref_preserves_given_names_suffixes_and_corporate_authors(self):
         item = {
             "title": ["Author metadata test"],

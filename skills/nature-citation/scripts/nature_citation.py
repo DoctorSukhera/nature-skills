@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Segment manuscript text, search strict Nature/CNS-family citation candidates, and export an
-EndNote file. By default the script writes only one output file in `.enw` format.
+Segment manuscript text, search strict Nature/CNS-family citation candidates, and export a
+reference-manager file. By default the script writes one inspectable `.ris` file.
 
 Optional review artifacts can still be generated, but they are opt-in.
 """
@@ -30,7 +30,7 @@ CROSSREF_API = "https://api.crossref.org/works"
 PUBMED_EFETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 USER_AGENT = "codex-nature-citation/1.0 (mailto:unknown@example.com)"
 EXPORT_FORMAT_CHOICES = ("enw", "ris", "zotero-rdf", "rdf")
-DEFAULT_EXPORT_FORMAT = "enw"
+DEFAULT_EXPORT_FORMAT = "ris"
 ZOTERO_RDF_NS = {
     "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     "z": "http://www.zotero.org/namespaces/export#",
@@ -1486,8 +1486,8 @@ def write_report(
             "",
             f"- Output file: `{output_name}`",
             f"- Format: `{export_format}` ({export_label(export_format)})",
-            "- ENW is suitable for EndNote tagged import.",
-            "- RIS can be imported into EndNote with Reference Manager (RIS).",
+            "- RIS is the default inspectable exchange format and imports into EndNote with Reference Manager (RIS).",
+            "- ENW is suitable for EndNote tagged import when explicitly selected.",
             "- Zotero RDF is suitable for direct Zotero import.",
         ]
     )
@@ -1980,8 +1980,8 @@ def write_html(
       <button id="openSummary" type="button">Guide</button>
       <label for="downloadFormat">Format</label>
       <select id="downloadFormat">
-        <option value="enw">ENW</option>
         <option value="ris">RIS</option>
+        <option value="enw">ENW</option>
         <option value="zotero-rdf">Zotero RDF</option>
       </select>
       <a class="primary" id="downloadSelected" href="{export_link}" download="{export_file_label}">Download selected / all</a>
@@ -2036,7 +2036,7 @@ def write_html(
     const selectedMap = new Map();
     let currentDownloadUrl = null;
 
-    downloadFormat.value = data.defaultExportFormat || 'enw';
+    downloadFormat.value = data.defaultExportFormat || 'ris';
 
     function showModal() {{
       if (modal) {{
