@@ -1,5 +1,19 @@
 # QA checklist
 
+## Contents
+
+- [Completeness](#completeness)
+- [Status calibration](#status-calibration)
+- [Traceability](#traceability)
+- [Revision formatting](#revision-formatting)
+- [Reviewer isolation](#reviewer-isolation)
+- [Factuality](#factuality)
+- [Tone](#tone)
+- [Actionability](#actionability)
+- [Final output gate](#final-output-gate)
+- [Readiness gate](#readiness-gate)
+
+
 Use this checklist before finalizing a response package or when auditing an existing draft.
 
 ## Completeness
@@ -62,6 +76,8 @@ Use this checklist before finalizing a response package or when auditing an exis
 
 ## Tone
 
+- No avoidable em dash, en dash, or colon is used as a routine sentence connector. Source-faithful
+  reviewer quotations and required identifiers or syntax are unchanged.
 - No accusations of reviewer incompetence, bias, or misunderstanding unless the user is explicitly preparing an appeal and supplies evidence.
 - No excessive apologies.
 - No repetitive empty thanks.

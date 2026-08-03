@@ -15,6 +15,11 @@ The master tracker is an editor-facing or author-internal verification document.
 - Keep response action, per-item work status, and package readiness separate: what should be done is not evidence that it has been done.
 - Do not invent experiments, analyses, citations, line numbers, figure panels, supplementary materials, editor instructions, reviewer identities, or manuscript changes.
 - Prefer concise, evidence-linked replies over long defensive explanations.
+- Avoid em dashes, en dashes, and colons as routine prose punctuation in response letters,
+  cover letters, internal summaries, and author notes. Prefer sentence boundaries, commas,
+  semicolons, parentheses, or a short heading followed by a new line. Preserve punctuation in
+  source-faithful reviewer quotations, titles, formulas, identifiers, URLs, times, and required
+  machine-readable syntax.
 - When disagreeing, acknowledge the concern first, then give a scientific or scope-based reason.
 - When a reviewer misunderstood the manuscript, first consider whether the manuscript presentation caused the misunderstanding.
 - When a reviewer missed information that was already present, treat the comment as evidence that the information was not sufficiently visible or clear. Answer the concern directly, improve the wording or placement when supported by the author, and cite the revised location.
@@ -38,6 +43,8 @@ The master tracker is an editor-facing or author-internal verification document.
 - Do not hide missing manuscript changes in comments or unrendered notes.
 - Do not write phrases such as "as Reviewer 2 also noted", "see our response to Reviewer 1", or "the other reviewer requested" in a reviewer-facing response.
 - Do not include another reviewer's comment IDs or recommendation in a reviewer-facing file.
+- Do not use dash punctuation or colons as habitual sentence connectors when clearer sentence
+  boundaries or headings work.
 - Do not rebuke a reviewer with phrases such as "we already stated this in the manuscript", "this was already explained", or "as clearly described in the original manuscript". Existing text does not excuse unclear presentation.
 
 ## Source hierarchy
