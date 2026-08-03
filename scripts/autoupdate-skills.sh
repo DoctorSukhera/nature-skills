@@ -11,13 +11,15 @@
 # anywhere you can run a command at startup (a shell profile, cron, etc.).
 #
 # It is safe to run constantly:
-#   - Throttled: skips the network entirely if it checked within THROTTLE seconds.
+#   - Throttled: skips the network if it checked within THROTTLE seconds, while
+#     still verifying and repairing the local destination on every invocation.
 #   - Offline-tolerant: a stalled/failed fetch is ignored and the run exits 0, so
 #     it never blocks or errors a session start (handy on flaky or blocked links).
 #   - Non-destructive: it only ever fast-forwards this clone. It refuses to run if
 #     the clone has local commits or a dirty tree, so a working dev checkout is
 #     never rewritten — keep this on a dedicated skills-only clone.
-#   - Cheap: it re-syncs skills only when the upstream HEAD changed.
+#   - Cheap: it re-syncs skills only when upstream changed or destination drift
+#     is detected.
 #
 # Usage:
 #   scripts/autoupdate-skills.sh                      # sync into ~/.claude/skills
@@ -72,12 +74,32 @@ LOG="$STATE_DIR/autoupdate.log"
 mkdir -p "$STATE_DIR" 2>/dev/null || true
 log() { printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$*" >>"$LOG" 2>/dev/null; }
 
-# --- throttle: skip the network if we checked recently --------------------
+installer="$REPO_ROOT/scripts/update-codex-skills.sh"
+if [ ! -x "$installer" ]; then
+  log "update-codex-skills.sh missing or not executable — skip sync"
+  exit 0
+fi
+
+sync_destination() {
+  if "$installer" --dest "$DEST" --prune >>"$LOG" 2>&1; then
+    log "sync OK -> $(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+    return 0
+  fi
+  log "sync FAILED"
+  return 1
+}
+
+# --- throttle: skip only the network; still verify the destination ---------
 now=$(date +%s)
 if [ "$THROTTLE" -gt 0 ] && [ -f "$STAMP" ]; then
   last=$(cat "$STAMP" 2>/dev/null || echo 0)
   case "$last" in ''|*[!0-9]*) last=0 ;; esac
   if [ $(( now - last )) -lt "$THROTTLE" ]; then
+    if "$installer" --dest "$DEST" --check >>"$LOG" 2>&1; then
+      exit 0
+    fi
+    log "network check throttled but destination drift detected; re-syncing skills into $DEST"
+    sync_destination
     exit 0
   fi
 fi
@@ -122,11 +144,6 @@ fi
 echo "$now" >"$STAMP"
 
 after=$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo none)
-installer="$REPO_ROOT/scripts/update-codex-skills.sh"
-if [ ! -x "$installer" ]; then
-  log "update-codex-skills.sh missing or not executable — skip sync"
-  exit 0
-fi
 
 if [ "$before" = "$after" ] && [ "$FORCE" != "1" ]; then
   if "$installer" --dest "$DEST" --check >>"$LOG" 2>&1; then
@@ -138,9 +155,5 @@ else
   log "upstream ${before} -> ${after}; syncing skills into $DEST"
 fi
 
-if "$installer" --dest "$DEST" --prune >>"$LOG" 2>&1; then
-  log "sync OK -> $after"
-else
-  log "sync FAILED"
-fi
+sync_destination
 exit 0

@@ -74,6 +74,13 @@ need_cmd() {
   command -v "$1" >/dev/null 2>&1 || die "$1 is required but not installed"
 }
 
+is_safe_managed_name() {
+  case "$1" in
+    ""|"."|".."|*/*|*\\*|*[!A-Za-z0-9._-]*) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --pull)
@@ -204,6 +211,10 @@ if [ "$PRUNE" = "1" ]; then
       case "$old_name" in
         ""|\#*) continue ;;
       esac
+      if ! is_safe_managed_name "$old_name"; then
+        printf 'warning: ignoring unsafe managed skill name: %q\n' "$old_name" >&2
+        continue
+      fi
       if ! grep -Fxq "$old_name" "$SKILL_LIST" && [ -d "$DST/$old_name" ]; then
         rm -rf "$DST/$old_name"
         echo "    pruned $old_name"
