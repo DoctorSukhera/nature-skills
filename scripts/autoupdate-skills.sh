@@ -4,8 +4,8 @@
 # upstream, cheaply enough to run on every agent/editor session start.
 #
 # This script lives inside a dedicated clone of this repository. On each run it
-# fast-forwards the clone to its upstream and, ONLY when upstream actually moved,
-# re-syncs the skills into your agent's skills directory via update-codex-skills.sh.
+# fast-forwards the clone to its upstream, verifies the installed destination,
+# and re-syncs via update-codex-skills.sh when upstream moved or local drift is found.
 #
 # Typical use is a Claude Code SessionStart hook (see the README), but it works
 # anywhere you can run a command at startup (a shell profile, cron, etc.).

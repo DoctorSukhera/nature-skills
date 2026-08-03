@@ -350,15 +350,16 @@ safe to run constantly: it skips the network if it already checked within the la
 hour, silently skips when offline or the pull fails (`exit 0`, never stalling a
 session), re-syncs when the upstream HEAD changes or the installed copy drifts, and refuses to
 fast-forward a clone that has uncommitted changes. New skills take effect on the
-**next** session (the current one already loaded its skills). Logs go to
-`~/.local/state/nature-skills/autoupdate.log`.
+**next** session (the current one already loaded its skills). Each destination
+has a separate log at
+`~/.local/state/nature-skills/<destination-id>/autoupdate.log`.
 
 The destination and check interval are both configurable:
 
 ```bash
 # Defaults to ~/.claude/skills; use --dest for another location, e.g. Codex:
 ~/ai-skills/nature-skills/scripts/autoupdate-skills.sh --dest ~/.codex/skills
-# Check at most once per hour:
+# Check the network at most once per hour; still verify the local install each run:
 ~/ai-skills/nature-skills/scripts/autoupdate-skills.sh --throttle 3600
 ```
 
@@ -475,7 +476,7 @@ Then create or merge `~/.codex/hooks.json`:
           {
             "type": "command",
             "command": "/bin/bash \"$HOME/.codex/.nature-skills-src/scripts/autoupdate-skills.sh\" --dest \"$HOME/.codex/skills\"",
-            "timeout": 75,
+            "timeout": 120,
             "statusMessage": "Checking Nature Skills updates"
           }
         ]
@@ -493,7 +494,8 @@ guard, and offline-safe exit to avoid repeated network checks or blocking startu
 when an update cannot be fetched. Even when upstream is unchanged, the script
 verifies the destination and repairs detected drift.
 
-Logs are written to `~/.local/state/nature-skills/autoupdate.log`. Newly fetched
+Each destination has a separate log at
+`~/.local/state/nature-skills/<destination-id>/autoupdate.log`. Newly fetched
 skills normally take full effect in the next session.
 
 ### 5.4 Other Agent Scenarios
