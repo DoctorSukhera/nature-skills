@@ -293,7 +293,7 @@ git clone https://github.com/Yuan1z0825/nature-skills.git ~/ai-skills/nature-ski
 }
 ```
 
-`async: true` 让它在后台运行、不阻塞启动。脚本自带保护：默认 6 小时内不重复联网检查、断网或拉取失败自动跳过（`exit 0`，绝不卡住会话）、只有上游 HEAD 真正变化时才重新同步、并且拒绝在有未提交改动的 clone 上强行前进。拉到的新版会在**下一次**开启会话时生效（当前会话的技能已经加载完毕）。运行日志在 `~/.local/state/nature-skills/autoupdate.log`。
+`async: true` 让它在后台运行、不阻塞启动。脚本自带保护：默认 1 小时内不重复联网检查、断网或拉取失败自动跳过（`exit 0`，绝不卡住会话）、上游变化或安装目录发生漂移时重新同步、并且拒绝在有未提交改动的 clone 上强行前进。拉到的新版会在**下一次**开启会话时生效（当前会话的技能已经加载完毕）。运行日志在 `~/.local/state/nature-skills/autoupdate.log`。
 
 目标目录与检查频率都可配置：
 
@@ -416,7 +416,7 @@ git clone https://github.com/Yuan1z0825/nature-skills.git ~/.codex/.nature-skill
 }
 ```
 
-若 `hooks.json` 中已有其他 hook，请合并 `SessionStart` 项，不要整体覆盖。首次启用或修改 hook 后，在 Codex 中运行 `/hooks` 检查并信任它。Codex 当前按同步方式执行 command hook，因此这里依靠脚本自带的 6 小时节流、60 秒网络保护和断网自动跳过，避免每次会话都重复联网或因更新失败阻断启动。
+若 `hooks.json` 中已有其他 hook，请合并 `SessionStart` 项，不要整体覆盖。首次启用或修改 hook 后，在 Codex 中运行 `/hooks` 检查并信任它。Codex 当前按同步方式执行 command hook，因此这里依靠脚本自带的 1 小时节流、60 秒网络保护和断网自动跳过，避免每次会话都重复联网或因更新失败阻断启动。即使上游版本未变化，脚本也会验证安装目录并在发现漂移时重新同步。
 
 更新日志位于 `~/.local/state/nature-skills/autoupdate.log`。拉取到的新技能通常在下一次会话中完整生效。
 
@@ -438,7 +438,7 @@ OpenClaw、OpenCode、Hermes 的具体接入方式见 [OpenClaw / OpenCode / Her
 
 | 技能 | 状态 | 用途 | 触发词 | 详情页 |
 |-------|--------|---------|-----------------|--------|
-| [`nature-figure`](skills/nature-figure/README.md) | Stable | 面向 Nature / 高影响力期刊的 Python 或 R 投稿级科研图工作流，内置 figures4papers demo，并支持通过 OpenRouter GPT Image 2 生成论文示意图草稿 | “Nature figure”, “投稿级图片”, “publication plot”, “scientific figure”, “figures4papers”, “论文示意图”, “GPT Image 2” | [详情](skills/nature-figure/README.md) |
+| [`nature-figure`](skills/nature-figure/README.md) | Stable | 面向 Nature / 高影响力期刊的 Python 或 R 投稿级科研图工作流，包含有独立版权说明的第三方 figures4papers 参考示例、原创模板和 OpenRouter GPT Image 2 论文示意图草稿 | “Nature figure”, “投稿级图片”, “publication plot”, “scientific figure”, “figures4papers”, “论文示意图”, “GPT Image 2” | [详情](skills/nature-figure/README.md) |
 | [`nature-polishing`](skills/nature-polishing/README.md) | Stable | 将学术文本润色、重构或翻译为 Nature 风格英文，并扫描全文术语、单位、数值精度和声称漂移 | “Nature style”, “润色”, “academic writing”, “论文英文” | [详情](skills/nature-polishing/README.md) |
 | [`nature-writing`](skills/nature-writing/README.md) | Draft | 起草 Nature 风格手稿章节，并重建论文论证 | “Nature writing”, “写摘要”, “写引言”, “manuscript draft”, “论文写作” | [详情](skills/nature-writing/README.md) |
 | [`nature-reviewer`](skills/nature-reviewer/README.md) | Draft | 从审稿人视角模拟 Nature 风格评审，输出三份互盲 reviewer reports、分级 Major/Minor 意见，并检查手稿内部一致性 | “Nature reviewer”, “预投稿评审”, “reviewer report”, “审稿人视角评估” | [详情](skills/nature-reviewer/README.md) |

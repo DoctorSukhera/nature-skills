@@ -347,8 +347,8 @@ an existing `hooks` block rather than replacing it):
 
 `async: true` runs it in the background so it never blocks startup. The script is
 safe to run constantly: it skips the network if it already checked within the last
-6 hours, silently skips when offline or the pull fails (`exit 0`, never stalling a
-session), re-syncs only when the upstream HEAD actually changed, and refuses to
+hour, silently skips when offline or the pull fails (`exit 0`, never stalling a
+session), re-syncs when the upstream HEAD changes or the installed copy drifts, and refuses to
 fast-forward a clone that has uncommitted changes. New skills take effect on the
 **next** session (the current one already loaded its skills). Logs go to
 `~/.local/state/nature-skills/autoupdate.log`.
@@ -488,9 +488,10 @@ Then create or merge `~/.codex/hooks.json`:
 If `hooks.json` already contains other hooks, merge the `SessionStart` entry
 instead of replacing the file. After enabling or changing the hook, run `/hooks`
 in Codex to review and trust it. Codex currently runs command hooks synchronously,
-so this setup relies on the script's built-in 6-hour throttle, 60-second network
+so this setup relies on the script's built-in 1-hour throttle, 60-second network
 guard, and offline-safe exit to avoid repeated network checks or blocking startup
-when an update cannot be fetched.
+when an update cannot be fetched. Even when upstream is unchanged, the script
+verifies the destination and repairs detected drift.
 
 Logs are written to `~/.local/state/nature-skills/autoupdate.log`. Newly fetched
 skills normally take full effect in the next session.
@@ -518,7 +519,7 @@ The current `skills/` directory contains the following triggerable skills.
 
 | Skill | Status | Purpose | Example Triggers | Details |
 |---|---|---|---|---|
-| [`nature-figure`](skills/nature-figure/README_EN.md) | Stable | Submission-grade Python or R scientific figure workflow for Nature / high-impact journals, with a figures4papers-style demo and OpenRouter GPT Image 2 schematic-draft generation | "Nature figure", "submission-grade figure", "publication plot", "scientific figure", "figures4papers", "paper schematic", "GPT Image 2" | [Details](skills/nature-figure/README_EN.md) |
+| [`nature-figure`](skills/nature-figure/README_EN.md) | Stable | Submission-grade Python or R scientific figure workflow for Nature / high-impact journals, with separately noticed third-party figures4papers references, original templates, and OpenRouter GPT Image 2 schematic drafts | "Nature figure", "submission-grade figure", "publication plot", "scientific figure", "figures4papers", "paper schematic", "GPT Image 2" | [Details](skills/nature-figure/README_EN.md) |
 | [`nature-polishing`](skills/nature-polishing/README_EN.md) | Stable | Polish, restructure, or translate academic prose into Nature-style English, with manuscript-wide terminology, unit, precision, and claim-drift checks | "Nature style", "polishing", "academic writing", "English manuscript" | [Details](skills/nature-polishing/README_EN.md) |
 | [`nature-writing`](skills/nature-writing/README_EN.md) | Draft | Draft Nature-style manuscript sections and rebuild a paper argument | "Nature writing", "write an abstract", "write introduction", "manuscript draft", "paper writing" | [Details](skills/nature-writing/README_EN.md) |
 | [`nature-reviewer`](skills/nature-reviewer/README_EN.md) | Draft | Simulate Nature-style reviewer assessment with three mutually blind reports, tiered Major/Minor comments, and manuscript-internal consistency checks | "Nature reviewer", "pre-submission review", "reviewer report", "reviewer-perspective assessment" | [Details](skills/nature-reviewer/README_EN.md) |

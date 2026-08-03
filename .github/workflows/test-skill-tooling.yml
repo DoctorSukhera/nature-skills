@@ -8,7 +8,10 @@ on:
       - 'skills/nature-paper-card/**'
       - 'skills/nature-paper-to-patent/**'
       - 'skills/nature-response/**'
+      - 'skills/nature-reviewer/**'
       - 'skills/nature-shared/**'
+      - 'scripts/update-codex-skills.sh'
+      - 'scripts/autoupdate-skills.sh'
       - '.github/workflows/test-skill-tooling.yml'
   push:
     branches:
@@ -19,7 +22,10 @@ on:
       - 'skills/nature-paper-card/**'
       - 'skills/nature-paper-to-patent/**'
       - 'skills/nature-response/**'
+      - 'skills/nature-reviewer/**'
       - 'skills/nature-shared/**'
+      - 'scripts/update-codex-skills.sh'
+      - 'scripts/autoupdate-skills.sh'
       - '.github/workflows/test-skill-tooling.yml'
   workflow_dispatch:
 
@@ -31,10 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.11'
           cache: pip
@@ -69,6 +75,10 @@ jobs:
         working-directory: skills/nature-response
         run: python -m pytest -q tests
 
+      - name: Test nature-reviewer instruction contracts
+        working-directory: skills/nature-reviewer
+        run: python -m pytest -q tests
+
       - name: Test nature-shared consistency tooling
         working-directory: skills/nature-shared
         run: python -m pytest -q tests
@@ -77,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
@@ -85,3 +95,23 @@ jobs:
       - name: Test nature-downloader JavaScript tooling
         working-directory: skills/nature-downloader
         run: bun test tests/unit
+
+  skill-sync-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Test skill install, verification, and drift detection
+        env:
+          TEST_DEST: ${{ runner.temp }}/nature-skills-sync-test
+        run: |
+          bash -n scripts/autoupdate-skills.sh
+          bash -n scripts/update-codex-skills.sh
+          bash scripts/update-codex-skills.sh --dest "$TEST_DEST"
+          bash scripts/update-codex-skills.sh --dest "$TEST_DEST" --check
+          touch "$TEST_DEST/nature-writing/unexpected-drift-file"
+          if bash scripts/update-codex-skills.sh --dest "$TEST_DEST" --check; then
+            echo "Expected verification to detect destination drift."
+            exit 1
+          fi

@@ -27,7 +27,7 @@
 #
 # Environment (flags take precedence):
 #   SKILLS_DEST=/path      Destination skills dir  (default ~/.claude/skills)
-#   SKILLS_THROTTLE=SECS   Min seconds between upstream checks (default 21600 = 6h; 0 = always)
+#   SKILLS_THROTTLE=SECS   Min seconds between upstream checks (default 3600 = 1h; 0 = always)
 #
 set -uo pipefail
 
@@ -35,7 +35,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 DEST="${SKILLS_DEST:-$HOME/.claude/skills}"
-THROTTLE="${SKILLS_THROTTLE:-21600}"
+THROTTLE="${SKILLS_THROTTLE:-3600}"
 FORCE=0
 
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/nature-skills"
@@ -116,20 +116,25 @@ fi
 echo "$now" >"$STAMP"
 
 after=$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo none)
-if [ "$before" = "$after" ] && [ "$FORCE" != "1" ]; then
-  log "up to date ($after)"
+installer="$REPO_ROOT/scripts/update-codex-skills.sh"
+if [ ! -x "$installer" ]; then
+  log "update-codex-skills.sh missing or not executable — skip sync"
   exit 0
 fi
 
-log "upstream ${before} -> ${after}; syncing skills into $DEST"
-installer="$REPO_ROOT/scripts/update-codex-skills.sh"
-if [ -x "$installer" ]; then
-  if "$installer" --dest "$DEST" --prune >>"$LOG" 2>&1; then
-    log "sync OK -> $after"
-  else
-    log "sync FAILED"
+if [ "$before" = "$after" ] && [ "$FORCE" != "1" ]; then
+  if "$installer" --dest "$DEST" --check >>"$LOG" 2>&1; then
+    log "up to date and destination verified ($after)"
+    exit 0
   fi
+  log "upstream unchanged but destination drift detected; re-syncing skills into $DEST"
 else
-  log "update-codex-skills.sh missing or not executable — skip sync"
+  log "upstream ${before} -> ${after}; syncing skills into $DEST"
+fi
+
+if "$installer" --dest "$DEST" --prune >>"$LOG" 2>&1; then
+  log "sync OK -> $after"
+else
+  log "sync FAILED"
 fi
 exit 0
