@@ -11,8 +11,8 @@ description: >-
   writing a data availability statement for any journal, code/data sharing sections, repository
   selection while writing a paper, and Chinese phrasings like 数据可用性声明、数据可用性、
   数据共享、代码可用性、学术写作数据声明、写数据声明、数据存放、数据仓库选择.
-version: 2.0.0
-author: Yuan1z skill, refactored into static/dynamic layers
+metadata:
+  author: Yuan1z skill, refactored into static/dynamic layers
 ---
 
 # Nature Data Availability — Router

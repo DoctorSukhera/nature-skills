@@ -7,12 +7,14 @@ on:
       - 'README.md'
       - 'README_EN.md'
       - 'scripts/validate-skill-metadata.py'
+      - 'scripts/tests/test_validate_skill_metadata.py'
   push:
     paths:
       - 'skills/**'
       - 'README.md'
       - 'README_EN.md'
       - 'scripts/validate-skill-metadata.py'
+      - 'scripts/tests/test_validate_skill_metadata.py'
   workflow_dispatch:
 
 permissions:
@@ -35,3 +37,6 @@ jobs:
 
       - name: Run metadata validator
         run: python scripts/validate-skill-metadata.py
+
+      - name: Run metadata validator regression tests
+        run: python -m unittest discover -s scripts/tests -p 'test_validate_skill_metadata.py'

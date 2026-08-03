@@ -3,6 +3,7 @@
 
 Checks every top-level directory under skills/ for:
 - required SKILL.md / README.md / README_EN.md / manifest.yaml files
+- valid SKILL.md YAML frontmatter with only supported keys
 - matching SKILL.md frontmatter name and manifest.yaml name
 - valid manifest YAML
 - relative manifest route paths, fragments, and scripts that exist on disk
@@ -24,16 +25,57 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 REQUIRED_FILES = ("SKILL.md", "README.md", "README_EN.md", "manifest.yaml")
 SUPPORT_ONLY = {"nature-shared"}
+ALLOWED_SKILL_FRONTMATTER_KEYS = {
+    "allowed-tools",
+    "description",
+    "license",
+    "metadata",
+    "name",
+}
+REQUIRED_SKILL_FRONTMATTER_KEYS = {"description", "name"}
 
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
-def skill_frontmatter_name(skill_md: Path) -> str | None:
+def parse_skill_frontmatter(skill_md: Path) -> tuple[dict[str, Any] | None, list[str]]:
+    """Parse and validate the leading YAML frontmatter in a SKILL.md file."""
     text = read_text(skill_md)
-    match = re.search(r"^name:\s*(.+?)\s*$", text, flags=re.MULTILINE)
-    return match.group(1).strip().strip('"\'') if match else None
+    rel = skill_md.relative_to(ROOT)
+    lines = text.splitlines()
+    if not lines or lines[0].strip() != "---":
+        return None, [f"{rel}: SKILL.md must start with YAML frontmatter"]
+
+    try:
+        closing = next(index for index, line in enumerate(lines[1:], 1) if line.strip() == "---")
+    except StopIteration:
+        return None, [f"{rel}: SKILL.md frontmatter is missing its closing ---"]
+
+    try:
+        frontmatter = yaml.safe_load("\n".join(lines[1:closing])) or {}
+    except Exception as exc:
+        return None, [f"{rel}: invalid SKILL.md frontmatter YAML: {exc}"]
+
+    if not isinstance(frontmatter, dict):
+        return None, [f"{rel}: SKILL.md frontmatter must be a mapping"]
+
+    errors: list[str] = []
+    keys = {str(key) for key in frontmatter}
+    unexpected = sorted(keys - ALLOWED_SKILL_FRONTMATTER_KEYS)
+    if unexpected:
+        errors.append(
+            f"{rel}: unsupported frontmatter keys: {', '.join(unexpected)}; "
+            f"allowed: {', '.join(sorted(ALLOWED_SKILL_FRONTMATTER_KEYS))}"
+        )
+    missing = sorted(REQUIRED_SKILL_FRONTMATTER_KEYS - keys)
+    if missing:
+        errors.append(f"{rel}: missing required frontmatter keys: {', '.join(missing)}")
+    for key in REQUIRED_SKILL_FRONTMATTER_KEYS:
+        value = frontmatter.get(key)
+        if key in keys and (not isinstance(value, str) or not value.strip()):
+            errors.append(f"{rel}: frontmatter {key} must be a non-empty string")
+    return frontmatter, errors
 
 
 PATH_KEYS = {"path", "reference", "script", "backend_script"}
@@ -126,8 +168,10 @@ def main() -> int:
             errors.append(f"{manifest_path.relative_to(ROOT)}: invalid YAML: {exc}")
             continue
 
+        frontmatter, frontmatter_errors = parse_skill_frontmatter(skill_md)
+        errors.extend(frontmatter_errors)
         manifest_name = manifest.get("name")
-        skill_name = skill_frontmatter_name(skill_md)
+        skill_name = frontmatter.get("name") if frontmatter else None
         if manifest_name != skill_name:
             errors.append(
                 f"{rel}: manifest name {manifest_name!r} does not match SKILL.md name {skill_name!r}"

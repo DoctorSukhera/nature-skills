@@ -12,8 +12,8 @@ description: >-
   adding references while writing a paper, finding sources/literature for a claim, building a
   reference list, citation/referencing for academic writing, and Chinese phrasings like
   学术写作引用、写论文加引用、写paper找文献、加参考文献、配文献、引用文献、文献支撑.
-version: 2.0.0
-author: Yuan1z skill, refactored into static/dynamic layers
+metadata:
+  author: Yuan1z skill, refactored into static/dynamic layers
 ---
 
 # Nature Citation — Router
