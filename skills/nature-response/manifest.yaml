@@ -1,5 +1,5 @@
 name: nature-response
-version: 1.4.0
+version: 1.5.0
 description: >
   Declarative manifest for the static/dynamic split. SKILL.md uses this to
   decide which fragments and templates to load for a reviewer-response or

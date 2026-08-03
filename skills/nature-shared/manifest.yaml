@@ -1,5 +1,5 @@
 name: nature-shared
-version: 1.0.0
+version: 1.1.0
 description: >
   Declarative manifest for shared Nature reference modules. This package is not
   a standalone workflow; installed Nature skills use it to load exact shared

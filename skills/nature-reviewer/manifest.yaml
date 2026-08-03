@@ -1,5 +1,5 @@
 name: nature-reviewer
-version: 1.3.0
+version: 1.4.0
 description: >
   Declarative manifest for the Nature-style reviewer assessment workflow. It
   keeps the referee-facing SKILL.md compact while loading source basis, axes,

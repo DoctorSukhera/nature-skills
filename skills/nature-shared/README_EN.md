@@ -17,7 +17,10 @@ always_load:
 | `core/paper-type-taxonomy.md` | `nature-polishing`, `nature-writing` |
 | `core/ethics.md` | `nature-polishing`, `nature-writing` |
 | `core/terminology-ledger.md` | `nature-polishing`, `nature-writing`, `nature-reader`, `nature-paper2ppt` |
+| `core/consistency-sweep.md` | `nature-polishing`, `nature-reviewer`, `nature-response`, `nature-statistics` |
 | `journal-formats/nat-comms.md` | `nature-polishing`, `nature-writing` |
+
+`scripts/check_consistency.py` provides a mechanical first pass for terminology variants, equal values reported at different precision, and equivalent lengths expressed in different units. Its output is a set of warnings for contextual review, not automatic edits.
 
 ## When to Put Files Here
 

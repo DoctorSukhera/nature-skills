@@ -16,6 +16,7 @@
 - Draft formal, restrained, submission-ready English point-by-point responses and cover letters.
 - Audit rebuttal drafts for missed replies, defensive tone, unsupported claims, and missing line numbers.
 - When a reviewer misses material already present in the manuscript, treat it as a clarity problem and improve the presentation instead of replying that it was already stated.
+- Mechanically check LaTeX revision packages for quoted-text drift, comment-response count mismatches, and clean-versus-marked manuscript text drift.
 
 ## Typical Requests
 
@@ -38,6 +39,7 @@
 - Manuscript-change checklist, missing-information checklist, and risk notes.
 - Per-item tracker with work status, required input, expected output, and finalization-blocking state.
 - Optional red-marked manuscript excerpts; manuscript text must come from the author.
+- A mechanical package-consistency report; compiled page locations, colors, citations, and references still require final PDF verification.
 
 ## Boundaries
 

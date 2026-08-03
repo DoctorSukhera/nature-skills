@@ -1,5 +1,5 @@
 name: nature-statistics
-version: 1.0.0
+version: 1.1.0
 description: >
   Declarative manifest for the statistics-reporting workflow. SKILL.md uses
   this to keep the always-needed reporting rules small while loading specialized

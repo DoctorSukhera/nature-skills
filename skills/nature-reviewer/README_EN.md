@@ -14,6 +14,7 @@
 - Keep severe criticism direct, professional, and evidence-grounded; keep minor comments specific and actionable without inventing issues to fill a quota.
 - Avoid dash punctuation and colons throughout the prose when a sentence boundary, comma, semicolon, parentheses, or a short label on a new line is clearer; retain necessary source punctuation and hyphens in stable IDs and compound terms.
 - Use an internal 12-axis technical checklist and bind each substantive concern to a claim pointer and verifiable evidence location.
+- Cross-check terminology, units, numeric precision, Methods counts, and table support within the manuscript, separating language issues from substantive contradictions that weaken credibility.
 - Do not coordinate or rewrite reviews to reduce duplication; treat an issue as consensus only when at least two reviewers raise it independently in the post-review synthesis.
 - Identify which readers would care about the work and why.
 

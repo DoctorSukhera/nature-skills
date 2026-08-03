@@ -159,7 +159,7 @@ Risk / unsupported claims
 | [references/role-boundaries.md](references/role-boundaries.md) | You need constraints on reviewer differences and editor-versus-reviewer boundaries |
 | [references/qa-checklist.md](references/qa-checklist.md) | You are finalizing an output and need groundedness / non-invention checks |
 | [../nature-shared/core/consistency-sweep.md](../nature-shared/core/consistency-sweep.md) | You are checking the manuscript against itself: headline counts that do not reconcile with the Methods, one metric at two precisions, a superlative contradicted by the paper's own table, overlapping error bars presented as an advantage, or internal summaries that disagree |
-| [references/editorial criteria and processes.md](references/editorial criteria and processes.md) | You need the primary local Nature source text |
+| [references/editorial criteria and processes.md](<references/editorial criteria and processes.md>) | You need the primary local Nature source text |
 
 ## Source hierarchy
 
