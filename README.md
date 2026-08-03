@@ -70,8 +70,7 @@
       <a href="https://apiciyuan.top/">https://apiciyuan.top/</a>
     </td>
     <td align="center" width="32%">
-  <img width="342" height="338" alt="ea3af1aadda16b0ddc18565450715d7c" src="https://github.com/user-attachments/assets/795cad8a-6a27-472f-8b61-1283c77fc7f0" />
-
+  <img width="1088" height="1101" alt="250d280342f34902a527721a118ac52e" src="https://github.com/user-attachments/assets/104eb9a1-383a-4b28-aa09-5ebe157a0b7b" />
       扫码添加微信客服
   </tr>
 </table>
