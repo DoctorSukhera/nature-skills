@@ -123,6 +123,59 @@ class OpenAIYamlTests(unittest.TestCase):
         )
         self.assertTrue(any("display_name must be double-quoted" in error for error in errors))
 
+    def test_support_only_skill_must_disable_implicit_invocation(self) -> None:
+        content = '''interface:
+  display_name: "Shared Support"
+  short_description: "Shared references for dependent skills only"
+  default_prompt: "Use $demo only as support for another skill."
+'''
+        errors = self.validate(content)
+        self.assertEqual([], errors)
+
+        original_root = VALIDATOR.ROOT
+        try:
+            with tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                path = root / "skills" / "demo" / "agents" / "openai.yaml"
+                path.parent.mkdir(parents=True)
+                path.write_text(content, encoding="utf-8")
+                VALIDATOR.ROOT = root
+                errors = VALIDATOR.validate_openai_yaml(
+                    path,
+                    "demo",
+                    require_implicit_disabled=True,
+                )
+        finally:
+            VALIDATOR.ROOT = original_root
+
+        self.assertTrue(any("allow_implicit_invocation" in error for error in errors))
+
+    def test_support_only_skill_accepts_explicit_disablement(self) -> None:
+        content = '''interface:
+  display_name: "Shared Support"
+  short_description: "Shared references for dependent skills only"
+  default_prompt: "Use $demo only as support for another skill."
+policy:
+  allow_implicit_invocation: false
+'''
+        original_root = VALIDATOR.ROOT
+        try:
+            with tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                path = root / "skills" / "demo" / "agents" / "openai.yaml"
+                path.parent.mkdir(parents=True)
+                path.write_text(content, encoding="utf-8")
+                VALIDATOR.ROOT = root
+                errors = VALIDATOR.validate_openai_yaml(
+                    path,
+                    "demo",
+                    require_implicit_disabled=True,
+                )
+        finally:
+            VALIDATOR.ROOT = original_root
+
+        self.assertEqual([], errors)
+
 
 if __name__ == "__main__":
     unittest.main()

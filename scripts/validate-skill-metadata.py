@@ -5,6 +5,7 @@ Checks every top-level directory under skills/ for:
 - required SKILL.md / README.md / README_EN.md / manifest.yaml files
 - valid SKILL.md YAML frontmatter with only supported keys
 - valid agents/openai.yaml interface metadata for every triggerable skill
+- explicit implicit-invocation disablement for every support-only skill
 - matching SKILL.md frontmatter name and manifest.yaml name
 - valid manifest YAML
 - relative manifest route paths, fragments, and scripts that exist on disk
@@ -26,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 REQUIRED_FILES = ("SKILL.md", "README.md", "README_EN.md", "manifest.yaml")
 SUPPORT_ONLY = {"nature-shared"}
+COMPATIBILITY_SKILL_NAMES = {"nature-proposal-writer": "researchwrite"}
 ALLOWED_SKILL_FRONTMATTER_KEYS = {
     "allowed-tools",
     "description",
@@ -84,7 +86,12 @@ def parse_skill_frontmatter(skill_md: Path) -> tuple[dict[str, Any] | None, list
     return frontmatter, errors
 
 
-def validate_openai_yaml(path: Path, skill_name: str) -> list[str]:
+def validate_openai_yaml(
+    path: Path,
+    skill_name: str,
+    *,
+    require_implicit_disabled: bool = False,
+) -> list[str]:
     """Validate the Codex-facing skill metadata contract."""
     rel = path.relative_to(ROOT)
     if not path.exists():
@@ -128,6 +135,14 @@ def validate_openai_yaml(path: Path, skill_name: str) -> list[str]:
         errors.append(
             f"{rel}: interface.default_prompt must explicitly mention ${skill_name}"
         )
+
+    if require_implicit_disabled:
+        policy = config.get("policy")
+        if not isinstance(policy, dict) or policy.get("allow_implicit_invocation") is not False:
+            errors.append(
+                f"{rel}: support-only skills must set "
+                "policy.allow_implicit_invocation to false"
+            )
     return errors
 
 
@@ -230,9 +245,20 @@ def main() -> int:
                 f"{rel}: manifest name {manifest_name!r} does not match SKILL.md name {skill_name!r}"
             )
 
-        if skill_dir.name not in SUPPORT_ONLY and isinstance(skill_name, str):
+        expected_skill_name = COMPATIBILITY_SKILL_NAMES.get(skill_dir.name, skill_dir.name)
+        if skill_name != expected_skill_name:
+            errors.append(
+                f"{rel}: SKILL.md name {skill_name!r} must match directory name "
+                f"{skill_dir.name!r} (expected {expected_skill_name!r})"
+            )
+
+        if isinstance(skill_name, str):
             errors.extend(
-                validate_openai_yaml(skill_dir / "agents" / "openai.yaml", skill_name)
+                validate_openai_yaml(
+                    skill_dir / "agents" / "openai.yaml",
+                    skill_name,
+                    require_implicit_disabled=skill_dir.name in SUPPORT_ONLY,
+                )
             )
 
         for raw_path in iter_manifest_paths(manifest):
