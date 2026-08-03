@@ -14,6 +14,8 @@ from typing import Iterable
 
 DEFAULT_QUOTE_MACROS = ("RevisedExcerpt", "revtext", "oldtext")
 MARKUP_MACROS = ("revised", "added", "changed")
+DELETION_MACROS = ("deletedtext", "deleted")
+INPUT_PATTERN = re.compile(r"\\(?:input|include)\s*\{([^{}]+)\}")
 
 
 @dataclass(frozen=True)
@@ -25,6 +27,31 @@ class Finding:
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
+
+
+def read_latex_project(path: Path, ancestors: tuple[Path, ...] = ()) -> str:
+    """Read a LaTeX root file and expand existing static input/include files."""
+    path = path.resolve()
+    if path in ancestors:
+        chain = " -> ".join(str(item) for item in (*ancestors, path))
+        raise ValueError(f"cyclic LaTeX include detected: {chain}")
+
+    text = strip_comments(read_text(path))
+
+    def expand(match: re.Match[str]) -> str:
+        raw_target = match.group(1).strip()
+        if not raw_target or "\\" in raw_target:
+            return match.group(0)
+        target = Path(raw_target)
+        if not target.suffix:
+            target = target.with_suffix(".tex")
+        if not target.is_absolute():
+            target = path.parent / target
+        if not target.is_file():
+            return match.group(0)
+        return read_latex_project(target, (*ancestors, path))
+
+    return INPUT_PATTERN.sub(expand, text)
 
 
 def matching_brace(text: str, opening: int) -> int | None:
@@ -77,11 +104,28 @@ def unwrap_single_argument_macros(text: str, macro_names: Iterable[str]) -> str:
         text = text[: match.start()] + text[opening + 1 : closing] + text[closing + 1 :]
 
 
+def remove_single_argument_macros(text: str, macro_names: Iterable[str]) -> str:
+    names = tuple(dict.fromkeys(macro_names))
+    if not names:
+        return text
+    pattern = re.compile(r"\\(" + "|".join(re.escape(name) for name in names) + r")\s*\{")
+    while True:
+        match = pattern.search(text)
+        if not match:
+            return text
+        opening = match.end() - 1
+        closing = matching_brace(text, opening)
+        if closing is None:
+            return text
+        text = text[: match.start()] + text[closing + 1 :]
+
+
 def strip_comments(text: str) -> str:
     return re.sub(r"(?<!\\)%.*$", "", text, flags=re.MULTILINE)
 
 
 def strip_revision_markup(text: str) -> str:
+    text = remove_single_argument_macros(text, DELETION_MACROS)
     text = unwrap_single_argument_macros(text, MARKUP_MACROS)
     text = re.sub(r"\\color\s*\{[^{}]*\}", "", text)
     text = re.sub(r"\\textcolor\s*\{[^{}]*\}\s*\{([^{}]*)\}", r"\1", text)
@@ -173,9 +217,12 @@ def run_checks(
     marked: Path | None = None,
     quote_macros: Iterable[str] = DEFAULT_QUOTE_MACROS,
     minimum_quote_length: int = 40,
+    substitutions: Iterable[tuple[str, str]] = (),
 ) -> list[Finding]:
-    manuscript_text = read_text(manuscript)
-    response_text = read_text(response)
+    manuscript_text = read_latex_project(manuscript)
+    response_text = read_latex_project(response)
+    for source, rendered in substitutions:
+        manuscript_text = manuscript_text.replace(source, rendered)
     findings = check_quotes(
         manuscript_text,
         response_text,
@@ -187,8 +234,8 @@ def run_checks(
     if clean is not None and marked is not None:
         findings.extend(
             check_clean_marked(
-                read_text(clean),
-                read_text(marked),
+                read_latex_project(clean),
+                read_latex_project(marked),
                 str(clean),
                 str(marked),
             )
@@ -211,6 +258,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="LaTeX macro whose braced argument is a manuscript quote. Repeat as needed.",
     )
     parser.add_argument("--minimum-quote-length", type=int, default=40)
+    parser.add_argument(
+        "--substitution",
+        action="append",
+        default=[],
+        metavar="SOURCE=RENDERED",
+        help=(
+            "Declare a deliberate source-to-rendered substitution used in a response quote, "
+            "for example 'Table \\ref{tab:main}=Table 1'. Repeat as needed."
+        ),
+    )
     parser.add_argument("--json", action="store_true", dest="as_json")
     return parser
 
@@ -223,6 +280,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.minimum_quote_length < 1:
         parser.error("--minimum-quote-length must be positive")
 
+    substitutions: list[tuple[str, str]] = []
+    for raw in args.substitution:
+        source, separator, rendered = raw.partition("=")
+        if not separator or not source or not rendered:
+            parser.error("--substitution must use non-empty SOURCE=RENDERED syntax")
+        substitutions.append((source, rendered))
+
     findings = run_checks(
         manuscript=args.manuscript,
         response=args.response,
@@ -230,6 +294,7 @@ def main(argv: list[str] | None = None) -> int:
         marked=args.marked,
         quote_macros=args.quote_macros or DEFAULT_QUOTE_MACROS,
         minimum_quote_length=args.minimum_quote_length,
+        substitutions=substitutions,
     )
     if args.as_json:
         print(json.dumps([asdict(item) for item in findings], ensure_ascii=False, indent=2))

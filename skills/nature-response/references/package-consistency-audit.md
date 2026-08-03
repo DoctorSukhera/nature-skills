@@ -1,5 +1,16 @@
 # Package consistency audit
 
+## Contents
+
+1. [The coupling rule](#1-the-coupling-rule)
+2. [Red marking must have a baseline](#2-red-marking-must-have-a-baseline)
+3. [Deletions ripple](#3-deletions-ripple)
+4. [Counting statements go stale](#4-counting-statements-go-stale)
+5. [Location references are volatile](#5-location-references-are-volatile)
+6. [Manuscript self-consistency and terminology drift](#6-manuscript-self-consistency-and-terminology-drift)
+7. [Etiquette failures that survive editing](#7-etiquette-failures-that-survive-editing)
+8. [Delivery gate](#8-delivery-gate)
+
 Use this file when a revision package is being finalized, re-edited after an earlier draft, or
 audited before submission. It covers the failures that are **mechanically verifiable** and that
 survive an editorial read: the manuscript and the response letter drifting apart, red marking that
@@ -21,13 +32,14 @@ comparing the two finds a mismatch and starts doubting everything else.
 
 Checks:
 
-- Every quoted passage in the letter appears **verbatim** in the manuscript source.
+- Every quoted passage in the letter appears **verbatim** in the expanded manuscript source,
+  including statically named `\\input{...}` and `\\include{...}` files.
 - Editing a quoted manuscript sentence triggers a letter update in the same commit, not later.
 - Whitespace, hyphenation, and unit changes count — `4.5 cm` in the letter against `45 mm` in the
   manuscript is a mismatch.
 - Where the letter resolves a cross-reference for readability (`Table \ref{tab:x}` printed as
-  `Table 1`), record that this substitution is deliberate so the automated check does not flag it
-  every round.
+  `Table 1`), record that substitution with a repeated `--substitution SOURCE=RENDERED` argument so
+  the automated check does not flag it every round.
 
 Script the check rather than eyeballing it. Resolve the script relative to this skill directory,
 then pass the actual package paths:
@@ -37,15 +49,19 @@ python scripts/check_package_consistency.py \
   --manuscript main.tex \
   --response response.tex \
   --clean main-clean.tex \
-  --marked main-marked.tex
+  --marked main-marked.tex \
+  --substitution 'Table \ref{tab:x}=Table 1'
 ```
 
-The checker normalizes LaTeX and whitespace, checks the arguments of `\\RevisedExcerpt`,
-`\\revtext`, and `\\oldtext` against the manuscript, compares the number of
-`\\ReviewerComment` and `\\AuthorResponse` blocks, and confirms that clean and marked sources have
-the same text after revision markup is removed. Use repeated `--quote-macro NAME` arguments when a
-project defines a different quote macro. Use `--json` for machine-readable findings. A non-zero
-exit status means the package still contains a mechanical mismatch.
+The checker expands existing statically named `\\input` and `\\include` files, normalizes LaTeX and
+whitespace, checks the arguments of `\\RevisedExcerpt`, `\\revtext`, and `\\oldtext` against the
+manuscript, compares the number of `\\ReviewerComment` and `\\AuthorResponse` blocks, removes
+`\\deletedtext` / `\\deleted` passages from the marked copy, and confirms that clean and marked
+sources otherwise have the same text after revision markup is removed. Use repeated
+`--quote-macro NAME` arguments when a project defines a different quote macro and repeated
+`--substitution SOURCE=RENDERED` arguments for deliberate rendered substitutions. Use `--json` for
+machine-readable findings. A non-zero exit status means the package still contains a mechanical
+mismatch.
 
 Re-run it after **every** manuscript edit. It does not replace compiled-PDF page checks, color
 inspection, citation/reference diagnostics, or editorial judgement. Those remain manual gates in

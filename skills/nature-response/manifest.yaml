@@ -1,5 +1,5 @@
 name: nature-response
-version: 1.5.0
+version: 1.6.0
 description: >
   Declarative manifest for the static/dynamic split. SKILL.md uses this to
   decide which fragments and templates to load for a reviewer-response or
@@ -48,5 +48,5 @@ references:
 quality_tools:
   package_consistency_script: scripts/check_package_consistency.py
   use_when: after the first complete LaTeX revision package, after every manuscript edit, and immediately before delivery
-  purpose: check response-letter quotes against the manuscript, pair reviewer comments with author responses, and compare clean and marked manuscript text after revision markup is removed
+  purpose: expand static LaTeX inputs, check response-letter quotes and declared rendered substitutions against the manuscript, pair reviewer comments with author responses, and compare clean and marked manuscript text after additions and deletions are normalized
   script_resolution: resolve relative to the loaded SKILL.md directory, never the user working directory

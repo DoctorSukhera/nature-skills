@@ -98,6 +98,65 @@ class PackageConsistencyTests(unittest.TestCase):
 
         self.assertIn("CLEAN_MARKED_TEXT_MISMATCH", {item.code for item in findings})
 
+    def test_multifile_manuscript_inputs_are_expanded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manuscript = self.write(root, "main.tex", r"\input{methods}")
+            self.write(root, "methods.tex", MANUSCRIPT_TEXT)
+            response = self.write(root, "response.tex", RESPONSE_TEXT)
+
+            findings = CHECKER.run_checks(manuscript, response)
+
+        self.assertEqual([], findings)
+
+    def test_declared_cross_reference_substitution_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manuscript = self.write(
+                root,
+                "main.tex",
+                r"The primary measurements are summarized in Table \ref{tab:main} for independent evaluation.",
+            )
+            response = self.write(
+                root,
+                "response.tex",
+                r"""
+\ReviewerComment{Please identify the relevant table.}
+\AuthorResponse{We now identify the relevant table.}
+\RevisedExcerpt{The primary measurements are summarized in Table 1 for independent evaluation.}
+""",
+            )
+
+            findings = CHECKER.run_checks(
+                manuscript,
+                response,
+                substitutions=[(r"Table \ref{tab:main}", "Table 1")],
+            )
+
+        self.assertEqual([], findings)
+
+    def test_deleted_text_is_removed_for_marked_comparison(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            clean_text = "The model uses cohort A and cohort C for evaluation."
+            manuscript = self.write(root, "main.tex", clean_text)
+            response = self.write(
+                root,
+                "response.tex",
+                r"\ReviewerComment{Please clarify the cohort definition.}"
+                r"\AuthorResponse{We removed the obsolete cohort.}",
+            )
+            clean = self.write(root, "clean.tex", clean_text)
+            marked = self.write(
+                root,
+                "marked.tex",
+                r"The model uses cohort A and \deletedtext{cohort B and }cohort C for evaluation.",
+            )
+
+            findings = CHECKER.run_checks(manuscript, response, clean, marked)
+
+        self.assertEqual([], findings)
+
 
 if __name__ == "__main__":
     unittest.main()
