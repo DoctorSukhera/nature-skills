@@ -33,4 +33,33 @@ if [ "$stamp_count" != "2" ]; then
   exit 1
 fi
 
-echo "Auto-update state isolation passed."
+RETRY_REPO="$TMP_DIR/retry-repo"
+mkdir -p "$RETRY_REPO/scripts" "$TMP_DIR/retry-home" "$TMP_DIR/retry-state"
+cp "$REPO_ROOT/scripts/autoupdate-skills.sh" "$RETRY_REPO/scripts/autoupdate-skills.sh"
+printf '%s\n' \
+  '#!/usr/bin/env bash' \
+  'printf "called\\n" >>"$AUTOUPDATE_TEST_CALLS"' \
+  'exit 1' >"$RETRY_REPO/scripts/update-codex-skills.sh"
+chmod +x "$RETRY_REPO/scripts/update-codex-skills.sh"
+
+run_failing_update() {
+  AUTOUPDATE_TEST_CALLS="$TMP_DIR/retry-calls" \
+  HOME="$TMP_DIR/retry-home" \
+  XDG_STATE_HOME="$TMP_DIR/retry-state" \
+  PATH="$TMP_DIR/bin:$PATH" \
+    bash "$RETRY_REPO/scripts/autoupdate-skills.sh" \
+      --dest "$TMP_DIR/retry-dest" \
+      --throttle 3600
+}
+
+run_failing_update
+calls_after_first=$(wc -l <"$TMP_DIR/retry-calls" | tr -d ' ')
+run_failing_update
+calls_after_second=$(wc -l <"$TMP_DIR/retry-calls" | tr -d ' ')
+
+if [ "$calls_after_second" -le "$calls_after_first" ]; then
+  echo "A failed destination sync was suppressed by the network throttle." >&2
+  exit 1
+fi
+
+echo "Auto-update state isolation and retry passed."

@@ -13,6 +13,7 @@ on:
       - 'scripts/update-codex-skills.sh'
       - 'scripts/autoupdate-skills.sh'
       - 'scripts/tests/test-autoupdate-state-isolation.sh'
+      - 'scripts/tests/test-update-codex-skills-safety.sh'
       - '.github/workflows/test-skill-tooling.yml'
   push:
     branches:
@@ -28,6 +29,7 @@ on:
       - 'scripts/update-codex-skills.sh'
       - 'scripts/autoupdate-skills.sh'
       - 'scripts/tests/test-autoupdate-state-isolation.sh'
+      - 'scripts/tests/test-update-codex-skills-safety.sh'
       - '.github/workflows/test-skill-tooling.yml'
   workflow_dispatch:
 
@@ -111,6 +113,7 @@ jobs:
           bash -n scripts/autoupdate-skills.sh
           bash -n scripts/update-codex-skills.sh
           bash scripts/tests/test-autoupdate-state-isolation.sh
+          bash scripts/tests/test-update-codex-skills-safety.sh
           bash scripts/update-codex-skills.sh --dest "$TEST_DEST"
           bash scripts/update-codex-skills.sh --dest "$TEST_DEST" --check
           touch "$TEST_DEST/nature-writing/unexpected-drift-file"
