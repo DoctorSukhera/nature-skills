@@ -8,6 +8,7 @@ on:
       - 'skills/nature-paper-card/**'
       - 'skills/nature-paper-to-patent/**'
       - 'skills/nature-response/**'
+      - 'skills/nature-shared/**'
       - '.github/workflows/test-skill-tooling.yml'
   push:
     branches:
@@ -18,6 +19,7 @@ on:
       - 'skills/nature-paper-card/**'
       - 'skills/nature-paper-to-patent/**'
       - 'skills/nature-response/**'
+      - 'skills/nature-shared/**'
       - '.github/workflows/test-skill-tooling.yml'
   workflow_dispatch:
 
@@ -65,6 +67,10 @@ jobs:
 
       - name: Test nature-response package consistency
         working-directory: skills/nature-response
+        run: python -m pytest -q tests
+
+      - name: Test nature-shared consistency tooling
+        working-directory: skills/nature-shared
         run: python -m pytest -q tests
 
   javascript-tests:

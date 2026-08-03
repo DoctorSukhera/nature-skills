@@ -28,6 +28,23 @@ For each axis, count every variant, then open the contexts of the minority forms
 times one way and once another way is almost always a real slip; a term split 5/4 usually means two
 different concepts are being conflated.
 
+Start the mechanical pass with the bundled checker, resolving it relative to the
+`nature-shared` package directory:
+
+```bash
+python scripts/check_consistency.py manuscript.tex tables.tex \
+  --term-group 'test-object=specimen|sample|test article' \
+  --term-group 'method-name=GraphNet|Graph Net'
+```
+
+The checker reports built-in self-reference and standard-deviation variants, user-supplied term
+groups, equal numeric values printed at different precision, and equivalent lengths written in
+different units. Use `--json` for machine-readable results or `--fail-on-findings` in a local
+quality gate. Findings are warnings, not automatic corrections: identical numbers may denote
+different quantities, and two terms may represent a real conceptual distinction. Inspect every
+reported context before editing. This first pass does not replace the claim, tense, acronym,
+cross-reference, or redundancy checks below.
+
 ## 2. Axes
 
 | Axis | What to look for | Typical real finding |
