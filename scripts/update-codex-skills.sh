@@ -130,7 +130,70 @@ need_cmd diff
 
 SKILL_LIST="$(mktemp "${TMPDIR:-/tmp}/nature-skills-list.XXXXXX")"
 DIFF_OUT="$(mktemp "${TMPDIR:-/tmp}/nature-skills-diff.XXXXXX")"
-trap 'rm -f "$SKILL_LIST" "$DIFF_OUT"' EXIT
+DEPLOYED_LIST="$(mktemp "${TMPDIR:-/tmp}/nature-skills-deployed.XXXXXX")"
+PRUNED_LIST="$(mktemp "${TMPDIR:-/tmp}/nature-skills-pruned.XXXXXX")"
+STAGE_ROOT=""
+BACKUP_ROOT=""
+MANIFEST_TMP=""
+TRANSACTION_ACTIVE=0
+CURRENT_NAME=""
+
+path_exists() {
+  [ -e "$1" ] || [ -L "$1" ]
+}
+
+rollback_transaction() {
+  local name had_previous backup_path dst_path
+
+  # CURRENT_NAME covers an interruption between the two rename operations.
+  if [ -n "$CURRENT_NAME" ]; then
+    backup_path="$BACKUP_ROOT/current/$CURRENT_NAME"
+    dst_path="$DST/$CURRENT_NAME"
+    if path_exists "$backup_path"; then
+      rm -rf "$dst_path"
+      mv "$backup_path" "$dst_path" 2>/dev/null || true
+    elif [ -n "$STAGE_ROOT" ] && ! path_exists "$STAGE_ROOT/$CURRENT_NAME"; then
+      rm -rf "$dst_path"
+    fi
+  fi
+
+  while IFS=$'\t' read -r name had_previous; do
+    [ -n "$name" ] || continue
+    backup_path="$BACKUP_ROOT/current/$name"
+    dst_path="$DST/$name"
+    if path_exists "$backup_path"; then
+      rm -rf "$dst_path"
+      mv "$backup_path" "$dst_path" 2>/dev/null || true
+    elif [ "$had_previous" = "0" ]; then
+      rm -rf "$dst_path"
+    fi
+  done < "$DEPLOYED_LIST"
+
+  while IFS= read -r name; do
+    [ -n "$name" ] || continue
+    backup_path="$BACKUP_ROOT/pruned/$name"
+    if path_exists "$backup_path" && ! path_exists "$DST/$name"; then
+      mv "$backup_path" "$DST/$name" 2>/dev/null || true
+    fi
+  done < "$PRUNED_LIST"
+}
+
+cleanup() {
+  local status=$?
+  trap - EXIT HUP INT TERM
+  set +e
+  if [ "$TRANSACTION_ACTIVE" = "1" ]; then
+    rollback_transaction
+  fi
+  [ -z "$MANIFEST_TMP" ] || rm -f "$MANIFEST_TMP"
+  [ -z "$STAGE_ROOT" ] || rm -rf "$STAGE_ROOT"
+  [ -z "$BACKUP_ROOT" ] || rm -rf "$BACKUP_ROOT"
+  rm -f "$SKILL_LIST" "$DIFF_OUT" "$DEPLOYED_LIST" "$PRUNED_LIST"
+  exit "$status"
+}
+
+trap cleanup EXIT
+trap 'exit 130' HUP INT TERM
 
 for path in "$SRC"/*/; do
   [ -d "$path" ] || continue
@@ -195,15 +258,39 @@ if [ "$CHECK_ONLY" = "1" ]; then
 fi
 
 mkdir -p "$DST"
-echo "==> Syncing skills from $SRC"
-echo "    into $DST"
+STAGE_ROOT="$(mktemp -d "$DST/.nature-skills-stage.XXXXXX")"
+BACKUP_ROOT="$(mktemp -d "$DST/.nature-skills-backup.XXXXXX")"
+mkdir -p "$BACKUP_ROOT/current" "$BACKUP_ROOT/pruned"
+
+echo "==> Staging skills from $SRC"
+echo "    for $DST"
 while IFS= read -r name; do
-  mkdir -p "$DST/$name"
-  rsync -a --delete "${RSYNC_EXCLUDES[@]}" "$SRC/$name/" "$DST/$name/"
-  echo "    synced $name"
+  mkdir -p "$STAGE_ROOT/$name"
+  rsync -a --delete "${RSYNC_EXCLUDES[@]}" "$SRC/$name/" "$STAGE_ROOT/$name/"
+  if ! diff -qr "${DIFF_EXCLUDES[@]}" "$SRC/$name" "$STAGE_ROOT/$name" >"$DIFF_OUT"; then
+    sed 's/^/         /' "$DIFF_OUT" >&2
+    die "staged copy of $name failed verification"
+  fi
+  echo "    staged $name"
 done < "$SKILL_LIST"
 
 manifest="$DST/$MANIFEST_NAME"
+TRANSACTION_ACTIVE=1
+
+echo "==> Activating staged skills"
+while IFS= read -r name; do
+  CURRENT_NAME="$name"
+  had_previous=0
+  if path_exists "$DST/$name"; then
+    had_previous=1
+    mv "$DST/$name" "$BACKUP_ROOT/current/$name"
+  fi
+  mv "$STAGE_ROOT/$name" "$DST/$name"
+  printf '%s\t%s\n' "$name" "$had_previous" >> "$DEPLOYED_LIST"
+  CURRENT_NAME=""
+  echo "    activated $name"
+done < "$SKILL_LIST"
+
 if [ "$PRUNE" = "1" ]; then
   if [ -f "$manifest" ]; then
     echo "==> Pruning stale directories previously managed by this script"
@@ -216,7 +303,8 @@ if [ "$PRUNE" = "1" ]; then
         continue
       fi
       if ! grep -Fxq "$old_name" "$SKILL_LIST" && [ -d "$DST/$old_name" ]; then
-        rm -rf "$DST/$old_name"
+        printf '%s\n' "$old_name" >> "$PRUNED_LIST"
+        mv "$DST/$old_name" "$BACKUP_ROOT/pruned/$old_name"
         echo "    pruned $old_name"
       fi
     done < "$manifest"
@@ -225,16 +313,24 @@ if [ "$PRUNE" = "1" ]; then
   fi
 fi
 
+MANIFEST_TMP="$(mktemp "$DST/.nature-skills-install.XXXXXX")"
 {
   echo "# Managed by nature-skills scripts/update-codex-skills.sh"
   echo "# source=$REPO_ROOT"
   echo "# commit=$repo_commit"
   date '+# updated_at=%Y-%m-%dT%H:%M:%S%z'
   cat "$SKILL_LIST"
-} > "$manifest"
+} > "$MANIFEST_TMP"
 
 echo "==> Verifying copied skills"
 verify_install
+
+mv "$MANIFEST_TMP" "$manifest"
+MANIFEST_TMP=""
+TRANSACTION_ACTIVE=0
+rm -rf "$STAGE_ROOT" "$BACKUP_ROOT"
+STAGE_ROOT=""
+BACKUP_ROOT=""
 
 echo "==> Done. Other skills in $DST were left untouched."
 echo "==> Installed from $repo_commit"
