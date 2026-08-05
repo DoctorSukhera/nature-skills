@@ -109,8 +109,8 @@
       <img width="300" alt="Agent 科研交流群" src="https://github.com/user-attachments/assets/28d1886a-69be-46bc-a1cb-777d7510ddab" />
     </td>
     <td align="center">
-      <b>袁博个人微信</b><br>
-      <img width="300" alt="袁博个人微信" src="https://github.com/user-attachments/assets/88e6b293-bda3-4094-94f9-aff4aa5a8842" />
+      <b>袁博个人微信，不备注不通过</b><br>
+      <img width="300" alt="袁博个人微信，不备注不通过" src="https://github.com/user-attachments/assets/88e6b293-bda3-4094-94f9-aff4aa5a8842" />
     </td>
   </tr>
 </table>
