@@ -1,0 +1,16 @@
+name: nature-image2ppt
+version: 1.0.0
+description: >
+  Self-contained Image2PPT runtime for reconstructing slide images, scanned PDFs,
+  and image-only PPTX files as object-level editable PowerPoint with rendered QA.
+
+source:
+  repository: https://github.com/Paul-Jeo/Image2PPT
+  commit: 6f751ab372b77c51a0403560dd4f735df371f39b
+  license: MIT
+
+runtime:
+  python: ">=3.10"
+  entrypoint: cli/image2ppt/cli.py
+  requirements: requirements.txt
+  config_template: config.example.yaml
