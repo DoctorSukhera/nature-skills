@@ -6,7 +6,7 @@ description: >
 
 source:
   repository: https://github.com/Paul-Jeo/Image2PPT
-  commit: 6f751ab372b77c51a0403560dd4f735df371f39b
+  commit: 3bcedf41a277a3a4ae8024f6030437930c969d30
   license: MIT
 
 runtime:
