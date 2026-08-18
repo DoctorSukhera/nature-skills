@@ -28,18 +28,20 @@
 
 1. 运行环境预检，规范化输入并生成 OCR 文字提示。
 2. 按语义区域拆解页面，在原生对象和局部图片资产之间进行混合重建。
-3. 对每页执行结构、箭头、区域分解和渲染检查，修复后再记录结果。
-4. 从页面 manifest 组装最终 PPTX，并重新验证渲染结果和 speaker notes。
+3. 对每页执行结构、箭头、区域分解和渲染检查；视觉结论以绑定当前源图/渲染哈希的逐项证据记录，不能用“看起来不错”代替。
+4. 从结构化 v2 页面 manifest 组装最终 PPTX，并重新验证渲染结果和 speaker notes。
 
 ## 产出
 
 - 对象级可编辑 PowerPoint 文件。
 - 每页的 manifest、文字提示、渲染预览和 QA 报告。
 - 最终文件验证结果，以及仍作为可替换图片资产保留的复杂视觉清单。
+- 页面输出严格限制在各自页面目录，最终文件限制在本次 run 目录，并采用原子写出避免失败后留下半成品。
 
 ## 运行和依赖
 
 - 使用 Python 3.10 或更高版本，并安装 `requirements.txt`。
+- 复制或同步技能文件不会自动安装 Python 包；必须在实际运行 CLI 的同一 Python 环境中安装依赖，并以 `doctor --json` 成功为准。
 - 使用 Microsoft PowerPoint（Windows）或 LibreOffice 完成渲染检查；以 `python cli/image2ppt/cli.py doctor --json` 的结果为准。
 - 在线文字识别使用百度 AI Studio `PADDLE_OCR_TOKEN`。将 `config.example.yaml` 复制为同目录的 `config.yaml` 后填写 Token；真实配置已被 Git 忽略，不能提交。
 - 完整实现同步自 [Paul-Jeo/Image2PPT](https://github.com/Paul-Jeo/Image2PPT)，并在本技能目录中保留 MIT License。
